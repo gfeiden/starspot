@@ -15,8 +15,8 @@ class Isochrone(object):
 
     def load(self):
         """ loads data from isochrone models """
-        isofile = 'dmestar_00{}myr_z+{}0_a+{}0_marcs.iso'.format(self.age,
-                self.Fe_H,self.a_Fe)
+        isofile = 'dmestar_00{}myr_z+{}_a+{}_marcs.iso'.format(
+                "%.1f" % self.age, "%.2f" % self.Fe_H, "%.2f" % self.a_Fe)
         isodata = np.genfromtxt(isofile,unpack=True)
         m = isodata[0]
         Teff = isodata[1]
