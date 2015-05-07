@@ -39,26 +39,36 @@ class Isochrone(object):
         # m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
         # B V Rc Ic J H K (2MASS)
         obsfile = open('colors_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
-                       kind[2], kind[3], kind[4]), 'w')
+                       kind[2], kind[3], kind[4]), 'a')
         obsfile.write('#'+'\n'+'#'+'    '+
                 'kind = '+kind[0]+'    '+
                 'zeta = '+str(kind[1])+'    '+
                 'epsilon = '+str(kind[2])+'    '+
                 'rho = '+str(kind[3])+'    '+
                 'pi = '+str(kind[4])+
-                '\n'+'#')
+                '\n'+'#'+'\n'+'#'+'   '+
+                'Mass'+'    '+'T_average'+'    '+
+                'log(g)'+'    '+'log_L'+'    '+
+                'log(R)'+'    '+'A(Li)'+'    '+
+                'B'+'    '+'V'+'    '+
+                'Rc'+'    '+'Ic'+'    '+
+                'J'+'    '+'H'+'    '+
+                'K'+'    ')
         obsfile.close()
         #Creates a file with data related to spot modelisation. Included :
         # m, Tphot, Tspot, log_Lphot, log_Lspot
         modfile = open('spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
-                       kind[2], kind[3], kind[4]), 'w')
+                       kind[2], kind[3], kind[4]), 'a')
         modfile.write('#'+'\n'+'#'+'    '+
                 'kind = '+kind[0]+'    '+
                 'zeta = '+str(kind[1])+'    '+
                 'epsilon = '+str(kind[2])+'    '+
                 'rho = '+str(kind[3])+'    '+
                 'pi = '+str(kind[4])+
-                '\n'+'#')
+                '\n'+'#'+'\n'+'#'+'    '+
+                'Mass'+'    '+'T_phot'+'    '+
+                'T_spot'+'    '+'log(L_phot)'+'    '+
+                'log(L_spot)'+'   ')
         modfile.close() 
         
 
