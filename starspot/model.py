@@ -1,6 +1,7 @@
 #
 #
 import numpy as np
+import t2color
 
 class Isochrone(object):
     """ provides instance of Dartmouth stellar evolution isochrone """
@@ -30,17 +31,15 @@ class Isochrone(object):
         """ """
 
     def colorize(self,*kind):
-        """ calcutes colors from isochrone data """
-        #
+        """ calculates magnitudes from isochrone data """
         #Fortran subroutine
-        #
-        kind=list(kind)
+        magnitude = t2color()
         #Creates a file with data comparable to observations. Included :
         # m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
         # B V Rc Ic J H K (2MASS)
-        obsfile = open('colors_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
+        magfile = open('mag_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
                        kind[2], kind[3], kind[4]), 'a')
-        obsfile.write('#'+'\n'+'#'+'    '+
+        magfile.write('#'+'\n'+'#'+'    '+
                 'kind = '+kind[0]+'    '+
                 'zeta = '+str(kind[1])+'    '+
                 'epsilon = '+str(kind[2])+'    '+
@@ -54,7 +53,7 @@ class Isochrone(object):
                 'Rc'+'    '+'Ic'+'    '+
                 'J'+'    '+'H'+'    '+
                 'K'+'    ')
-        obsfile.close()
+        magfile.close()
         #Creates a file with data related to spot modelisation. Included :
         # m, Tphot, Tspot, log_Lphot, log_Lspot
         modfile = open('spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
@@ -69,7 +68,8 @@ class Isochrone(object):
                 'Mass'+'    '+'T_phot'+'    '+
                 'T_spot'+'    '+'log(L_phot)'+'    '+
                 'log(L_spot)'+'   ')
-        modfile.close() 
+        modfile.close()
+        return magnitude
         
 
 class MassTrack(object):
