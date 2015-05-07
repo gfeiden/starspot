@@ -29,6 +29,39 @@ class Isochrone(object):
     def unload(self):
         """ """
 
+    def colorize(self,*kind):
+        """ calcutes colors from isochrone data """
+        #
+        #Fortran subroutine
+        #
+        kind=list(kind)
+        #Creates a file with data comparable to observations. Included :
+        # m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
+        # B V Rc Ic J H K (2MASS)
+        obsfile = open('colors_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
+                       kind[2], kind[3], kind[4]), 'w')
+        obsfile.write('#'+'\n'+'#'+'    '+
+                'kind = '+kind[0]+'    '+
+                'zeta = '+str(kind[1])+'    '+
+                'epsilon = '+str(kind[2])+'    '+
+                'rho = '+str(kind[3])+'    '+
+                'pi = '+str(kind[4])+
+                '\n'+'#')
+        obsfile.close()
+        #Creates a file with data related to spot modelisation. Included :
+        # m, Tphot, Tspot, log_Lphot, log_Lspot
+        modfile = open('spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(kind[1],
+                       kind[2], kind[3], kind[4]), 'w')
+        modfile.write('#'+'\n'+'#'+'    '+
+                'kind = '+kind[0]+'    '+
+                'zeta = '+str(kind[1])+'    '+
+                'epsilon = '+str(kind[2])+'    '+
+                'rho = '+str(kind[3])+'    '+
+                'pi = '+str(kind[4])+
+                '\n'+'#')
+        modfile.close() 
+        
+
 class MassTrack(object):
     """ provides instance of Dartmouth stellar evolution mass track """
 
