@@ -29,26 +29,65 @@ module isochrone
 
 contains
 
-    subroutine init(feh, afe, isochrone_length, numbers_of_mags, filters)
+    subroutine init(feh, afe, isochrone_length, isochrone_width, numbers_of_mags)
         ! initialize arrays for input isochrone and magnitudes and 
         ! generate bolometric correction and color tables at the given
         ! metallicity.
+        integer :: isochrone_length, isochrone_width, numbers_of_mags
 
         ! allocate input and output arrays
         if (allocated(isochrone) .eqv. .false.) then
-            allocate(isochrone(isochrone_length, 12))
+            allocate(isochrone(isochrone_length, isochrone_width))
         end if
 
         if (allocated(mags) .eqv. .false.) then
-            allocate(mags(isochrone_length, 12))
+            allocate(mags(isochrone_length, numbers_of_mags))
         end if
 
         ! interpolate tables for the given composition
-        call some_subroutine(feh, afe)
+        if (afe == 0.0_dp) then
+            call getbc_p00(0, feh, 0.0)
+        else if (afe == 0.4_dp) then
+            call getbc_p04(0, feh, 0.0)
+        else if (afe == -0.4_dp) then
+            call getbc_m04(0, feh, 0.0)
+        else
+            call getbc_std(0, feh, 0.0)
+        end if
+
     end subroutine init
 
-    subroutine add_color(feh, afe, isochrone, isochrone_length, mags)
+    subroutine add_color(feh, isochrone)
         ! color in the isochrone, including contributions from spots.
+        real(dp), parameter :: ebv = 0.0
+
+        do i = 1, size(isochrone, 1)
+            ! define parameters for star
+            if (surface_coverge > 0.0) then
+                logg = isochrone(i, 2)
+                logt_phot = isochrone(i, 4)
+                logt_spot = isochrone(i, 5)
+                logl_phot = isochrone(i, 6)
+                logl_spot = isochrone(i, 7)
+            else
+                logg = isochrone(i, 3)
+                logl_phot = isochrone(i, 4)
+                logt_phot = isochrone(i, 2)
+                logt_spot = logt_phot
+                logl_spot = 0.0
+            end if
+
+            ! unspotted region
+            call getbc(1, feh, logg, logt_phot, ebv, bc_phot, fil, nbc)
+            M_bol = M_bol_solar - 2.5*logl_phot
+            do j = 1, 5
+            end do
+
+            ! spotted region
+            if (surface_coverge > 0.0)
+                call getbc(1, feh, logg, logt_phot, ebv, bc_spot, fil, nbc)
+            end if
+        end do
     end subroutine add_color
 
     subroutine clean()
