@@ -27,11 +27,14 @@ module isochrone
 
     real(dp), dimension(:,:), allocatable :: isochrone, mags
 
+contains
+
     subroutine init(feh, afe, isochrone_length, numbers_of_mags, filters)
         ! initialize arrays for input isochrone and magnitudes and 
         ! generate bolometric correction and color tables at the given
         ! metallicity.
-        !
+
+        ! allocate input and output arrays
         if (allocated(isochrone) .eqv. .false.) then
             allocate(isochrone(isochrone_length, 12))
         end if
@@ -40,10 +43,19 @@ module isochrone
             allocate(mags(isochrone_length, 12))
         end if
 
+        ! interpolate tables for the given composition
+        call some_subroutine(feh, afe)
     end subroutine init
 
     subroutine add_color(feh, afe, isochrone, isochrone_length, mags)
         ! color in the isochrone, including contributions from spots.
     end subroutine add_color
+
+    subroutine clean()
+        ! free up memory from allocated arrays
+        if (allocated(isochrone) .eqv. .true.) deallocate(isochrone)
+        if (allocated(mags) .eqv. .true.) deallocate(mags)
+
+    end subroutine
 
 end module isochrone
