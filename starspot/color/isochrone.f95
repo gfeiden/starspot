@@ -20,20 +20,30 @@
 ! OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ! SOFTWARE.
 
-subroutine add_color(feh, afe, logg, logl_phot, logl_spot, T_phot, T_spot, f_spot, mags)
+module isochrone
     implicit none
 
-    ! define double precision type
     integer, parameter :: dp = selected_real_kind(15, 307)
 
-    ! input parameters
-    real(dp), intent(in) :: feh, afe, logg, logl_phot, logl_spot, T_phot, T_spot, f_spot
+    real(dp), dimension(:,:), allocatable :: isochrone, mags
 
-    ! output magnitudes
-    real(dp), dimension(:), allocatable :: mags
+    subroutine init(feh, afe, isochrone_length, numbers_of_mags, filters)
+        ! initialize arrays for input isochrone and magnitudes and 
+        ! generate bolometric correction and color tables at the given
+        ! metallicity.
+        !
+        if (allocated(isochrone) .eqv. .false.) then
+            allocate(isochrone(isochrone_length, 12))
+        end if
 
-Cf2py intent(in) feh, afe, logg, logl_phot, logl_spot, T_phot, T_spot, f_spot
-Cf2py intent(out) mags
+        if (allocated(mags) .eqv. .false.) then
+            allocate(mags(isochrone_length, 12))
+        end if
 
+    end subroutine init
 
-end subroutine add_color
+    subroutine add_color(feh, afe, isochrone, isochrone_length, mags)
+        ! color in the isochrone, including contributions from spots.
+    end subroutine add_color
+
+end module isochrone
