@@ -22,8 +22,7 @@
 
 module isochrone
     implicit none
-
-    integer, parameter :: dp = selected_real_kind(15, 307)
+    use utils
 
     real(dp), dimension(:,:), allocatable :: isochrone, mags
 
