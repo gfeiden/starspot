@@ -28,5 +28,25 @@ module utils
     integer, parameter :: qp = selected_real_kind(33, 4931)
 
 contains
+    subroutine log_init()
+    end subroutine log_init
+
+    subroutine log_warn(message)
+        character(len=132) :: message
+        write(logger, ' ---- WARNING: ') message
+    end subroutine log_warn
+
+    subroutine log_error(message)
+        character(len=132) :: message
+        write(logger, ' **** ERROR: ') message
+    end subroutine log_error
+
+    subroutine log_note(message)
+        character(len=132) :: message
+        write(logger, ' NOTE: ') message
+    end subroutine log_note
+
+    subroutine log_close()
+    end subroutine log_close
 
 end module utils
