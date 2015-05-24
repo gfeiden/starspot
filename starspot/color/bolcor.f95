@@ -251,7 +251,7 @@ contains
             end if
             call log_note('reading bc table ' // trim(filename) // ' into memory')
             do j = 1, n_fehs
-                read(90, '(11x, f5.2)') fehs(j)
+                read(90, '(10x, f6.2)') fehs(j)
                 do k = 1, n_loggs
                     read(90, *) (bc_tables(i, j, k, m), m = 1, end_teff(k))
                     !read(90, '(' // end_teff(k) // 'f8.4)') (bc_tables(i, j, k, m), m = 1, end_teff(k))
