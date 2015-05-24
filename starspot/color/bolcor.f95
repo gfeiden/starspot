@@ -173,9 +173,9 @@ contains
 
         integer :: i, j, k, m  ! loop iterators
         integer :: ioerr       ! error flag
-        integer :: feh_index
+        integer :: feh_index, bcv
 
-        character :: directory, filename
+        character(len=132) :: directory, filename
 
         real(dp) :: ebv
         real(dp), intent(in) :: feh, afe
@@ -196,12 +196,12 @@ contains
         end if
 
         ! open data header, allocate memory, read header, and close
-        open(unit=90, file=directory // 'header.data', status='old', iostat=ioerr)
+        open(unit=90, file=trim(directory) // 'header.data', status='old', iostat=ioerr)
         if (ioerr /= 0) then
             call log_error('header file IO error in marcs08, cannot continue')
             stop
         end if
-        read(90, '(1x, i3, 14x, i2, 14x, i2, 14x, i2, 21x, f6.3)') n_teffs, n_loggs, n_fehs, ebv
+        read(90, '(i3, 14x, i2, 14x, i2, 14x, i2, 21x, f6.3)') n_teffs, n_loggs, n_fehs, bcv, ebv
 
         if (allocated(fehs) .eqv. .false.) allocate(fehs(n_fehs))
         if (allocated(teffs) .eqv. .false.) allocate(teffs(n_teffs))
@@ -231,29 +231,25 @@ contains
             ! format directory and filename
             select case(trim(passbands(i)))
                 case('U', 'B', 'V', 'R', 'I', 'Rc', 'Ic')
-                    directory = directory // 'ubvri12/'
-                    filename = 'jc_' // trim(passbands(i)) // '.data'
+                    filename = trim(directory) // 'ubvri12/' // 'jc_' // trim(passbands(i)) // '.data'
                 case('Ux', 'Bx', 'U_90', 'B_90', 'V_90', 'R_90', 'I_90', 'Rc_90', 'Ic_90')
-                    directory = directory // 'ubvri90/'
-                    filename = 'jc_' // trim(passbands(i)) // '.data'
+                    filename = trim(directory) // 'ubvri90/' // 'jc_' // trim(passbands(i)) // '.data'
                 case('J', 'H', 'K')
-                    directory = directory // '2mass/'
-                    filename = '2mass_' // trim(passbands(i)) // '.data'
+                    filename = trim(directory) // '2mass/' // '2mass_' // trim(passbands(i)) // '.data'
                 case('u', 'g', 'r', 'i', 'z')
-                    directory = directory // 'sdss/'
-                    filename = 'sdss_' // trim(passbands(i)) // '.data'
+                    filename = trim(directory) // 'sdss/' // 'sdss_' // trim(passbands(i)) // '.data'
                 case default
                     call log_error('invalid passband requested')
                     stop
             end select
 
             ! read bolometric corrections into memory
-            open(90, file=filename, status='old', iostat=ioerr)
+            open(90, file=trim(filename), status='old', iostat=ioerr)
             if (ioerr /= 0) then
-                call log_error('bc table file IO error in marcs08, cannot continue')
+                call log_error('bc table file IO error in marcs, cannot continue: ' // trim(filename))
                 stop
             end if
-            call log_note('reading bc tables into memory')
+            call log_note('reading bc table ' // trim(filename) // ' into memory')
             do j = 1, n_fehs
                 read(90, '(11x, f5.2)') fehs(j)
                 do k = 1, n_loggs
