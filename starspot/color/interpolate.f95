@@ -55,7 +55,35 @@ contains
     end subroutine akima_spline_edge
 
     subroutine akima_spline()
-    end subroutine
+    end subroutine akima_spline
+
+    subroutine lagrange(x, coeffs, x_new, degree)
+        ! N-point Lagrangian interpolation
+        integer  :: i, j, degree
+        real(dp) :: x_new, denom
+        real(dp), dimension(degree), intent(in)  :: x
+        real(dp), dimension(degree), intent(out) :: coeffs
+
+        if (degree <= 0) then
+            call log_error('invalid degree for Lagrange interpolation, cannot continue')
+            stop
+        else if (degree < 3) then
+            call log_warn('Lagrange interpolation attempted with degree < 3, beware of results')
+        end if
+
+        do i = 1, degree
+            denom = 1.0_dp
+            coeffs(i) = 1.0_dp
+            do j = 1, degree
+                if (j /= i) then
+                    denom = denom*(x(i) - x(j))
+                    coeffs(i) = coeffs(i)*(x_new - x(j))
+                end if
+            end do
+            coeffs(i) = coeffs(i)/denom
+        end do
+
+    end subroutine lagrange
 
 
 end module interpolate
