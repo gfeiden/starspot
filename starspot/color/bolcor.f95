@@ -28,7 +28,7 @@ module bolcorrection
     integer, dimension(:), allocatable :: end_teff
 
     real(dp), dimension(:), allocatable :: fehs, teffs, loggs
-    real(dp), dimension(:,:,:,:), allocatable :: bc_tables
+    real(dp), dimension(:,:,:), allocatable :: bc_table
 
     character(len=15) :: bc_type
     character(len=5), dimension(:), allocatable :: passbands
@@ -66,24 +66,113 @@ contains
         call log_note('bolometric correction tables successfully initialized')
     end subroutine bc_init
 
-    subroutine bc_eval(feh, afe)
+    subroutine bc_eval(teff, logg, logl, magnitudes)
+        use interpolate, only: lagrange
+
+        integer :: i, j, k, teff_index, logg_index
+        real(dp) :: m_bol
+        real(dp), intent(in) :: teff, logg, logl
+        real(dp), parameter  :: m_bol_sun = 4.74
+        real(dp), dimension(4) :: coeffs
+        real(dp), dimension(:), intent(out) :: magnitudes
+
+        if (allocated(magnitudes) .eqv. .false.) then
+            call log_note('allocating memory for magnitudes in bc_eval')
+            allocate(magnitudes(n_passbands))
+        else
+            call log_warn('magnitudes in bc_eval already allocated')
+            deallocate(magnitudes)
+            allocate(magnitudes(n_passbands))
+        end if
+
+        ! define bolometric magnitude
+        m_bol = m_bol_sun - 2.5*logl
+
+        ! hunt for logg and teff indicies
+        do i = 1, n_loggs
+            if (loggs(i) > logg) then
+                j = i
+                exit
+            else
+                cycle
+            end if
+        end do
+
+        do i = 1, n_teffs
+            if (teffs(i) > teff) then
+                k = i
+                exit
+            else
+                cycle
+            end if
+        end do
+
+        ! protect against edge effects
+        if (n_loggs - j < 1) then
+            logg_index = n_loggs - 1
+        else if (j < 3) then
+            logg_index = 3
+        else
+            logg_index = j
+        end if
+
+        if (n_teffs - k < 1) then
+            teff_index = n_teffs - 1
+        else (k < 3) then
+            teff_index = 3
+        else
+            teff_index = k
+        end if
+
+        ! get interpolation coefficients for teff
+        call lagrange(teffs(teff_index - 2:teff_index + 1), coeffs, teff, 4)
+
+        ! intepolate in teff
+        do i = 1, n_passbands
+            do j = 1, n_loggs
+                bc_loggs(i, j) = coeffs(1)*bc_table(i, j, teff_index - 2) + &
+                                 coeffs(2)*bc_table(i, j, teff_index - 1) + &
+                                 coeffs(3)*bc_table(i, j, teff_index    ) + &
+                                 coeffs(4)*bc_table(i, j, teff_index + 1)
+            end do
+        end do
+
+        ! get interpolation coefficients for logg
+        call lagrange(loggs(logg_index - 2:logg_index + 1), coeffs, logg, 4)
+
+        ! interpolate at requested logg
+        do i = 1, n_passbands
+            magnitudes(i) = coeffs(1)*bc_table(i, logg_index - 2) + &
+                            coeffs(2)*bc_table(i, logg_index - 1) + &
+                            coeffs(3)*bc_table(i, logg_index    ) + &
+                            coeffs(4)*bc_table(i, logg_index + 1)
+
+            magnitudes(i) = m_bol - magnitudes(i)
+        end do
+
     end subroutine bc_eval
 
     subroutine bc_clean()
         if (allocated(passbands) .eqv. .true.) deallocate(passbands)
-        if (allocated(bc_tables) .eqv. .true.) deallocate(bc_tables)
+        if (allocated(bc_tables) .eqv. .true.) deallocate(bc_table)
         if (allocated(teffs) .eqv. .true.) deallocate(teffs)
         if (allocated(loggs) .eqv. .true.) deallocate(loggs)
         if (allocated(end_teff) .eqv. .true.) deallocate(end_teff)
     end subroutine bc_clean
 
-    subroutine marcs()
+    subroutine marcs(feh, afe)
+        use interpolate, only: lagrange
+
         integer :: i, j, k, m  ! loop iterators
         integer :: ioerr       ! error flag
+        integer :: feh_index
 
         character :: directory, filename
 
         real(dp) :: ebv
+        real(dp), intent(in) :: feh, afe
+        real(dp), dimension(4) :: coeffs
+        real(dp), dimension(:,:,:,:), allocatable :: bc_tables
 
         if (afe < -10.0) then
             directory = 'tab/std/'
@@ -116,6 +205,11 @@ contains
 
         ! allocate memory for tabulated data
         if (allocated(bc_tables) .eqv. .false.) then
+            call log_note('allocating memory for bc tables')
+            allocate(bc_tables(n_passbands, n_fehs, n_loggs, n_teffs))
+        else
+            log_warn('bc tables already allocated to memory, reallocating')
+            deallocate(bc_tables)
             allocate(bc_tables(n_passbands, n_fehs, n_loggs, n_teffs))
         end if
 
@@ -147,6 +241,7 @@ contains
                 call log_error('bc table file IO error in marcs08, cannot continue')
                 stop
             end if
+            call log_note('reading bc tables into memory')
             do j = 1, n_fehs
                 read(90, '(11x, f5.2)') fehs(j)
                 do k = 1, n_loggs
@@ -157,6 +252,50 @@ contains
 
         end do ! passband loop
 
+        if (allocated(bc_table) .eqv. .false.) then
+            call log_note('allocating memory for bolometric correction table')
+            allocate(bc_table(n_passbands, n_loggs, n_teffs))
+        else
+            call log_warn('bolometric correction table already defined: redefining')
+            deallocate(bc_table)
+            allocate(bc_table(n_passbands, n_loggs, n_teffs))
+        end if
+
+        ! find indices of nearest 4 [Fe/H] values
+        do i = 1, n_fehs
+            if (fehs(i) > feh) then
+                j = i
+                exit
+            else
+                cycle
+            end if
+        end do
+
+        ! protect against edge errors
+        if (n_fehs - j < 1) then
+            feh_index = n_fehs - 1
+        else if (j < 3) then
+            feh_index = 3
+        else
+            feh_index = j
+        end if
+
+        ! get interpolation coefficients with 4th order lagrange method
+        call lagrange(fehs(feh_index - 2:feh_index + 1), coeffs, feh, 4)
+
+        ! interpolate at the requested [Fe/H]
+        do i = 1, n_passbands
+            do j = 1, n_loggs
+                do k = 1, end_teff(j)
+                    bc_table(i, j, k) = coeffs(1)*bc_tables(i, feh_index - 2, j, k) + &
+                                        coeffs(2)*bc_tables(i, feh_index - 1, j, k) + &
+                                        coeffs(3)*bc_tables(i, feh_index    , j, k) + &
+                                        coeffs(4)*bc_tables(i, feh_index + 1, j, k)
+                end do
+            end do
+        end do
+
+        if (allocated(bc_tables .eqv. .true.)) deallocate(bc_tables)
     end subroutine marcs
 
     subroutine phoenix_amescond()

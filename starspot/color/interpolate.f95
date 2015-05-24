@@ -69,6 +69,8 @@ contains
             stop
         else if (degree < 3) then
             call log_warn('Lagrange interpolation attempted with degree < 3, beware of results')
+        else
+            continue
         end if
 
         do i = 1, degree
