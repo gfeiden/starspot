@@ -26,27 +26,31 @@ module utils
     integer, parameter :: sp = selected_real_kind(6, 37)
     integer, parameter :: dp = selected_real_kind(15, 307)
     integer, parameter :: qp = selected_real_kind(33, 4931)
+    integer, parameter :: log_unit = 99
 
 contains
-    subroutine log_init()
+    subroutine log_init(filename)
+        character(len=132) :: filename
+        open(log_unit, file=trim(filename), status='new')
     end subroutine log_init
 
     subroutine log_warn(message)
         character(len=132) :: message
-        write(logger, ' ---- WARNING: ') message
+        write(log_unit, ' ---- WARNING: ') message
     end subroutine log_warn
 
     subroutine log_error(message)
         character(len=132) :: message
-        write(logger, ' **** ERROR: ') message
+        write(log_unit, ' **** ERROR: ') message
     end subroutine log_error
 
     subroutine log_note(message)
         character(len=132) :: message
-        write(logger, ' NOTE: ') message
+        write(log_unit, ' NOTE: ') message
     end subroutine log_note
 
     subroutine log_close()
+        close(log_unit)
     end subroutine log_close
 
 end module utils
