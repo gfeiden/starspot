@@ -30,23 +30,23 @@ module utils
 
 contains
     subroutine log_init(filename)
-        character(len=132) :: filename
+        character(len=*) :: filename
         open(log_unit, file=trim(filename), status='new')
     end subroutine log_init
 
     subroutine log_warn(message)
-        character(len=132) :: message
-        write(log_unit, ' ---- WARNING: ') message
+        character(len=*) :: message
+        write(log_unit, '(" ---- WARNING: ", A)') message
     end subroutine log_warn
 
     subroutine log_error(message)
-        character(len=132) :: message
-        write(log_unit, ' **** ERROR: ') message
+        character(len=*) :: message
+        write(log_unit, '(" **** ERROR: ", A)') message
     end subroutine log_error
 
     subroutine log_note(message)
-        character(len=132) :: message
-        write(log_unit, ' NOTE: ') message
+        character(len=*) :: message
+        write(log_unit, '(" NOTE: ", A)') message
     end subroutine log_note
 
     subroutine log_close()

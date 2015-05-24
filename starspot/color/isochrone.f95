@@ -21,8 +21,8 @@
 ! SOFTWARE.
 
 module isochrone
-    implicit none
     use utils
+    implicit none
 
     real(dp), dimension(:,:), allocatable :: isochrone, mags
 

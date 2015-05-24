@@ -21,10 +21,10 @@
 ! SOFTWARE.
 
 module interpolate
-    implicit none
     use utils
+    implicit none
 
-    public  :: akima_setup, akima_spline
+    public  :: akima_setup, akima_spline, lagrange
     private :: akima_spline_edge
 
 contains
@@ -34,7 +34,7 @@ contains
 
     subroutine akima_spline_edge(x1, x2, x3, f1, f2, f3, f00, f01)
         real(dp) :: df21, df31, dx21, dx31, dx32, den, g1, g2
-        real(dp), intent(in)  :: x1, x2, x2, f1, f2, f3
+        real(dp), intent(in)  :: x1, x2, x3, f1, f2, f3
         real(dp), intent(out) :: f00, f01
 
         ! compute differences

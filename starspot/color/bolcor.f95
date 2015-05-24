@@ -21,8 +21,8 @@
 ! SOFTWARE.
 
 module bolcorrection
-    implicit none
     use utils
+    implicit none
 
     integer :: n_passbands, n_teffs, n_loggs, n_fehs
     integer, dimension(:), allocatable :: end_teff
@@ -39,8 +39,10 @@ module bolcorrection
 contains
 
     subroutine bc_init(feh, afe, brand, filters)
+        integer :: i
+
         real(dp), intent(in) :: feh, afe
-        
+
         character(len=15), intent(in) :: brand
         character(len=5), dimension(:), intent(in) :: filters
 
@@ -62,7 +64,7 @@ contains
                 call vc_semiemp()
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
-                call marcs()
+                call marcs(feh, afe)
         end select
 
         call log_note('bolometric correction tables successfully initialized')
@@ -76,7 +78,8 @@ contains
         real(dp), intent(in) :: teff, logg, logl
         real(dp), parameter  :: m_bol_sun = 4.74
         real(dp), dimension(4) :: coeffs
-        real(dp), dimension(:), intent(out) :: magnitudes
+        real(dp), dimension(:,:), allocatable :: bc_loggs
+        real(dp), dimension(:), allocatable, intent(out) :: magnitudes
 
         if (allocated(magnitudes) .eqv. .false.) then
             call log_note('allocating memory for magnitudes in bc_eval')
@@ -120,7 +123,7 @@ contains
 
         if (n_teffs - k < 1) then
             teff_index = n_teffs - 1
-        else (k < 3) then
+        else if (k < 3) then
             teff_index = 3
         else
             teff_index = k
@@ -130,6 +133,7 @@ contains
         call lagrange(teffs(teff_index - 2:teff_index + 1), coeffs, teff, 4)
 
         ! intepolate in teff
+        if (allocated(bc_loggs) .eqv. .false.) allocate(bc_loggs(n_passbands, n_loggs))
         do i = 1, n_passbands
             do j = 1, n_loggs
                 bc_loggs(i, j) = coeffs(1)*bc_table(i, j, teff_index - 2) + &
@@ -144,19 +148,21 @@ contains
 
         ! interpolate at requested logg
         do i = 1, n_passbands
-            magnitudes(i) = coeffs(1)*bc_table(i, logg_index - 2) + &
-                            coeffs(2)*bc_table(i, logg_index - 1) + &
-                            coeffs(3)*bc_table(i, logg_index    ) + &
-                            coeffs(4)*bc_table(i, logg_index + 1)
+            magnitudes(i) = coeffs(1)*bc_loggs(i, logg_index - 2) + &
+                            coeffs(2)*bc_loggs(i, logg_index - 1) + &
+                            coeffs(3)*bc_loggs(i, logg_index    ) + &
+                            coeffs(4)*bc_loggs(i, logg_index + 1)
 
             magnitudes(i) = m_bol - magnitudes(i)
         end do
+
+        if (allocated(bc_loggs) .eqv. .true.) deallocate(bc_loggs)
 
     end subroutine bc_eval
 
     subroutine bc_clean()
         if (allocated(passbands) .eqv. .true.) deallocate(passbands)
-        if (allocated(bc_tables) .eqv. .true.) deallocate(bc_table)
+        if (allocated(bc_table) .eqv. .true.) deallocate(bc_table)
         if (allocated(teffs) .eqv. .true.) deallocate(teffs)
         if (allocated(loggs) .eqv. .true.) deallocate(loggs)
         if (allocated(end_teff) .eqv. .true.) deallocate(end_teff)
@@ -187,6 +193,7 @@ contains
         else
             call log_warn('strange [a/Fe] requested. default to standard')
             directory = 'tab/std/'
+        end if
 
         ! open data header, allocate memory, read header, and close
         open(unit=90, file=directory // 'header.data', status='old', iostat=ioerr)
@@ -200,9 +207,12 @@ contains
         if (allocated(teffs) .eqv. .false.) allocate(teffs(n_teffs))
         if (allocated(loggs) .eqv. .false.) allocate(loggs(n_loggs))
         if (allocated(end_teff) .eqv. .false.) allocate(end_teff(n_loggs))
-        read(90, '(' // n_teffs // 'f6.0)') (teffs(i), i = 1, n_teffs)
-        read(90, '(' // n_loggs // 'f4.1)') (loggs(i), i = 1, n_loggs)
-        read(90, '(' // n_loggs // 'i4') (end_teff(i), i = 1, n_loggs)
+        read(90, *) (teffs(i), i = 1, n_teffs)
+        read(90, *) (loggs(i), i = 1, n_loggs)
+        read(90, *) (end_teff(i), i = 1, n_loggs)
+        !read(90, '(' // n_teffs // 'f6.0)') (teffs(i), i = 1, n_teffs)
+        !read(90, '(' // n_loggs // 'f4.1)') (loggs(i), i = 1, n_loggs)
+        !read(90, '(' // n_loggs // 'i4') (end_teff(i), i = 1, n_loggs)
         close(90)
 
         ! allocate memory for tabulated data
@@ -210,7 +220,7 @@ contains
             call log_note('allocating memory for bc tables')
             allocate(bc_tables(n_passbands, n_fehs, n_loggs, n_teffs))
         else
-            log_warn('bc tables already allocated to memory, reallocating')
+            call log_warn('bc tables already allocated to memory, reallocating')
             deallocate(bc_tables)
             allocate(bc_tables(n_passbands, n_fehs, n_loggs, n_teffs))
         end if
@@ -247,7 +257,8 @@ contains
             do j = 1, n_fehs
                 read(90, '(11x, f5.2)') fehs(j)
                 do k = 1, n_loggs
-                    read(90, '(' // end_teff(k) // 'f8.4)') (bc_tables(i, j, k, m), m = 1, end_teff(k))
+                    read(90, *) (bc_tables(i, j, k, m), m = 1, end_teff(k))
+                    !read(90, '(' // end_teff(k) // 'f8.4)') (bc_tables(i, j, k, m), m = 1, end_teff(k))
                 end do ! logg loop
             end do ! [Fe/H] loop
             close(90)
@@ -297,13 +308,15 @@ contains
             end do
         end do
 
-        if (allocated(bc_tables .eqv. .true.)) deallocate(bc_tables)
+        if (allocated(bc_tables) .eqv. .true.) deallocate(bc_tables)
     end subroutine marcs
 
     subroutine phoenix_amescond()
+        return
     end subroutine phoenix_amescond
 
     subroutine vc_semiemp()
+        return
     end subroutine vc_semiemp
 
 
