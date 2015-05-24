@@ -38,7 +38,9 @@ module bolcorrection
 
 contains
 
-    subroutine bc_init(brand, filters)
+    subroutine bc_init(feh, afe, brand, filters)
+        real(dp), intent(in) :: feh, afe
+        
         character(len=15), intent(in) :: brand
         character(len=5), dimension(:), intent(in) :: filters
 
@@ -53,7 +55,7 @@ contains
         ! initialize bolometric correction tables
         select case (bc_type)
             case ('marcs')
-                call marcs()
+                call marcs(feh, afe)
             case ('phx_amescond')
                 call phoenix_amescond()
             case ('vc_semiemp')

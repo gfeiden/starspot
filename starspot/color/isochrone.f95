@@ -28,10 +28,12 @@ module isochrone
 
 contains
 
-    subroutine init(feh, afe, isochrone_length, isochrone_width, numbers_of_mags)
+    subroutine init(feh, afe, filters, isochrone_length, isochrone_width)
         ! initialize arrays for input isochrone and magnitudes and 
         ! generate bolometric correction and color tables at the given
         ! metallicity.
+        use bolcorrection, only: bc_init
+
         integer :: isochrone_length, isochrone_width, numbers_of_mags
 
         ! allocate input and output arrays
@@ -44,21 +46,14 @@ contains
         end if
 
         ! interpolate tables for the given composition
-        if (afe == 0.0_dp) then
-            call getbc_p00(0, feh, 0.0)
-        else if (afe == 0.4_dp) then
-            call getbc_p04(0, feh, 0.0)
-        else if (afe == -0.4_dp) then
-            call getbc_m04(0, feh, 0.0)
-        else
-            call getbc_std(0, feh, 0.0)
-        end if
+        call bc_init(feh, afe, brand, filters)
 
     end subroutine init
 
     subroutine add_color(feh, isochrone)
         ! color in the isochrone, including contributions from spots.
-        real(dp), parameter :: ebv = 0.0
+        real(dp), intent(in) :: feh
+        real(dp) :: logg, logt_phot, logt_spot, logl_phot, logl_spot, surface_coverge
 
         do i = 1, size(isochrone, 1)
             ! define parameters for star
@@ -77,14 +72,11 @@ contains
             end if
 
             ! unspotted region
-            call getbc(1, feh, logg, logt_phot, ebv, bc_phot, fil, nbc)
-            M_bol = M_bol_solar - 2.5*logl_phot
-            do j = 1, 5
-            end do
+            call bc_eval(10.0**logt_phot, logg, logl_phot, mags)
 
             ! spotted region
             if (surface_coverge > 0.0)
-                call getbc(1, feh, logg, logt_phot, ebv, bc_spot, fil, nbc)
+                call bc_eval(10.0**logt_spot, logg, logl_spot, mags)
             end if
         end do
     end subroutine add_color
