@@ -1,7 +1,24 @@
 # Bolometric Corrections for Stellar Models 
 
-References
-----------
+
+## Compiling
+
+Fortran 95 code included in this sub-package is written to be compatible with 
+the NumPy/SciPy package `f2py`, allowing the Fortran code to be wrapped natively
+into Python scripts. To compile and wrap the Fortran modules, execute the
+following command:
+
+``` f2py -c -m bolcor utils.f95 interpolate.f95 bolcor.f95 ```
+
+With installations of NumPy/SciPy on Mac with either Homebrew or MacPort,
+`f2py` may need to be called with the Python version number, such as
+
+``` f2py-2.7 -c -m bolcor utils.f95 interpolate.f95 bolcor.f95 ```
+
+This creates a library called `bolcor.so` that can be imported into Python
+routines.
+
+## References
 
 MARCS bolometric correction tables computed for the entire grid of MARCS 
 models (Gustafsson et al. [2008, A&A, 486, 951](http://adsabs.harvard.edu/abs/2008A%26A...486..951G)) 
