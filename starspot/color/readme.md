@@ -56,11 +56,15 @@ bc.utils.log_close()
 
 ```
 
-For the moment, you *must* initialize the log file. This will hopefully 
+For the moment, you *must* initialize a log file. This will hopefully 
 be updated soon so the code recognizes whether this step has been performed.
 It is also advisable to execute the clean and close routines to ensure 
 that memory is properly released and that the log file stream is properly 
 closed and the log data saved.
+
+Note that, for the moment, arguments for `bc_eval` should be scalars. In 
+the future this will be updated to handle arrays for both spotted and un-spotted
+stars.
 
 ## References
 
