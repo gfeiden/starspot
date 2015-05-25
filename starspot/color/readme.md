@@ -84,6 +84,11 @@ in Dotter et al. ([2007, PhDT](http://adsabs.harvard.edu/abs/2007PhDT........17D
 
 http://stellar.dartmouth.edu/models/
 
+Semi-empirical bolometric corrections were derived by VandenBerg & Clem 
+([2003, AJ, 126, 778](http://adsabs.harvard.edu/abs/2003AJ....126..778V))
+by empirically correcting theoretical bolometric corrections derived from 
+MARCS and ATLAS9 model atmospheres. See their publication for details.
+
 # Citations
 
 If you make use of this code, please cite the relevant publications and 
