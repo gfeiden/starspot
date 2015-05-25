@@ -37,12 +37,20 @@ import bolcor as bc
 # initialize log file
 bc.utils.log_init('example.log')
 
-# transform stellar parameters into UBVRIJHK magnitudes
+# initialize bolometric correction table at fixed [Fe/H] and [a/Fe]
+Fe_H = 0.0          # iron abundance relative to solar
+A_Fe = 0.0          # alpha abundance relative to solar
+type = 'marcs'      # type of bolometric correction
 filters = ['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
-bc.bolcorrection.bc_init(0.0, 0.0, 'marcs', filters)
+bc.bolcorrection.bc_init(Fe_H, A_Fe, type, filters)
 
-magnitudes = bc.bolcorrection.bc_eval(3000.0, 5.0, -2.65, 8)
+# transform stellar parameters into UBVRIJHK magnitudes
+Teff = 3000.0       # effective temperature, in K
+logg = 5.0          # log10(gravity) in cgs units 
+logL = -2.65        # log10(Luminosity / Luminosity_sun)
+magnitudes = bc.bolcorrection.bc_eval(Teff, logg, logL, len(filters))
 
+# release allocated memory and close log file
 bc.bolcorrection.bc_clean()
 bc.utils.log_close()
 
