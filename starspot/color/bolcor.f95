@@ -33,7 +33,7 @@ module bolcorrection
     character(len=15) :: bc_type
     character(len=5), dimension(:), allocatable :: passbands
 
-    ! f2py does not play well with private routines, all must be public
+    ! no private routines allowed with f2py
     !private :: marcs, phoenix_amescond, vc_semiemp
     !public  :: bc_init, bc_eval, bc_clean
 
@@ -44,11 +44,13 @@ contains
 
         real(dp), intent(in) :: feh, afe
 
-        character(len=*), intent(in) :: brand
-        character(len=*), dimension(:), intent(in) :: filters
+        character(len=15), intent(in) :: brand
+        character(len=1), dimension(:), intent(in) :: filters
 
-!f2py intent(in) feh, afe, brand, filters
+        !f2py intent(in) feh, afe, brand, filters
+        write(*, *) filters(1)
 
+        call log_note('*** starting run ***')
         n_passbands = size(filters, 1)
         if (allocated(passbands) .eqv. .false.) allocate(passbands(n_passbands))
 
@@ -57,6 +59,7 @@ contains
             passbands(i) = trim(filters(i))
         end do
 
+        call log_note('initializing bolometric correction tables')
         ! initialize bolometric correction tables
         select case (trim(bc_type))
             case ('marcs')
@@ -73,28 +76,31 @@ contains
         call log_note('bolometric correction tables successfully initialized')
     end subroutine bc_init
 
-    subroutine bc_eval(teff, logg, logl, magnitudes)
+    subroutine bc_eval(teff, logg, logl, mag_length, magnitudes)
         use interpolate, only: lagrange
 
-        integer :: i, j, k, teff_index, logg_index
+        integer :: i, j, k, teff_index, logg_index, mag_length
         real(dp) :: m_bol
         real(dp), intent(in) :: teff, logg, logl
         real(dp), parameter  :: m_bol_sun = 4.74
         real(dp), dimension(4) :: coeffs
         real(dp), dimension(:,:), allocatable :: bc_loggs
-        real(dp), dimension(:), allocatable, intent(out) :: magnitudes
+        real(dp), dimension(mag_length), intent(out) :: magnitudes
 
-!f2py intent(in) teff, logg, logl
-!f2py intent(out) magnitudes
+        !f2py intent(in) teff, logg, logl, mag_length
+        !f2py intent(out) magnitudes
+        !f2py depend(mag_length) magnitudes
 
-        if (allocated(magnitudes) .eqv. .false.) then
-            call log_note('allocating memory for magnitudes in bc_eval')
-            allocate(magnitudes(n_passbands))
-        else
-            call log_warn('magnitudes in bc_eval already allocated')
-            deallocate(magnitudes)
-            allocate(magnitudes(n_passbands))
-        end if
+        ! allocatable output arrays don't play well with f2py
+        !
+        !if (allocated(magnitudes) .eqv. .false.) then
+        !    call log_note('allocating memory for magnitudes in bc_eval')
+        !    allocate(magnitudes(n_passbands))
+        !else
+        !    call log_warn('magnitudes in bc_eval already allocated')
+        !    deallocate(magnitudes)
+        !    allocate(magnitudes(n_passbands))
+        !end if
 
         ! define bolometric magnitude
         m_bol = m_bol_sun - 2.5*logl
