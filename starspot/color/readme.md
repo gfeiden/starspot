@@ -39,6 +39,10 @@ routines.
 
 ## Usage
 
+Bolometric corrections may be obtained for Johnson _UBV_, Cousins
+_RI_, 2MASS _JHK_, and SDSS _ugriz_ bandpasses. HST magnitudes will be
+available in the near future.
+
 Here is a quick example of how to use these routines in a Fortran program
 to compute bolometric correction for a single set of stellar parameters.
 
