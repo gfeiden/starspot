@@ -8,12 +8,16 @@ the NumPy/SciPy package `f2py`, allowing the Fortran code to be wrapped natively
 into Python scripts. To compile and wrap the Fortran modules, execute the
 following command:
 
-``` f2py -c -m bolcor utils.f95 interpolate.f95 bolcor.f95 ```
+```bash 
+f2py -c -m bolcor utils.f95 interpolate.f95 bolcor.f95 
+```
 
 With installations of NumPy/SciPy on Mac with either Homebrew or MacPort,
 `f2py` may need to be called with the Python version number, such as
 
-``` f2py-2.7 -c -m bolcor utils.f95 interpolate.f95 bolcor.f95 ```
+```bash
+f2py-2.7 -c -m bolcor utils.f95 interpolate.f95 bolcor.f95 
+```
 
 This creates a library called `bolcor.so` that can be imported into Python
 routines.
@@ -27,7 +31,7 @@ to access subroutines in the separate modules. This is achieved by calling
 `bolcor.module_name.subroutine(args)`. Here is a quick example to derive 
 magnitudes for a single set of input parameters:
 
-```
+```python
 import bolcor as bc
 
 # initialize log file
