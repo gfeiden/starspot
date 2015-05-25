@@ -61,8 +61,14 @@ program example
     call log_close()
 
 end program example
-
 ```
+
+This example assumes that no changes are made to the Fortran routines. However,
+if one is opting for Fortran over Python (see below), then it is possible
+to simplify the call and allow magnitudes to be an allocatable array. Not 
+crucial, it can just make life easier and the code neater. To do so, look 
+into `bolcor` for segements of commented code referring to `f2py` not 
+playing nicely.
 
 Within a Python script, the Fortran routines can be called after importing
 the `bolcor` library. Modules and global variables are then accessible by 
