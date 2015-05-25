@@ -18,6 +18,38 @@ With installations of NumPy/SciPy on Mac with either Homebrew or MacPort,
 This creates a library called `bolcor.so` that can be imported into Python
 routines.
 
+## Usage
+
+Within a Python script, the Fortran routines can be called after importing
+the `bolcor` library. Modules and global variables are then accessible by 
+calling `bolcor.module_name` or `bolcor.global_var_name`, but often one wants 
+to access subroutines in the separate modules. This is achieved by calling 
+`bolcor.module_name.subroutine(args)`. Here is a quick example to derive 
+magnitudes for a single set of input parameters:
+
+```
+import bolcor as bc
+
+# initialize log file
+bc.utils.log_init('example.log')
+
+# transform stellar parameters into UBVRIJHK magnitudes
+filters = ['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
+bc.bolcorrection.bc_init(0.0, 0.0, 'marcs', filters)
+
+magnitudes = bc.bolcorrection.bc_eval(3000.0, 5.0, -2.65, 8)
+
+bc.bolcorrection.bc_clean()
+bc.utils.log_close()
+
+```
+
+For the moment, you *must* initialize the log file. This will hopefully 
+be updated soon so the code recognizes whether this step has been performed.
+It is also advisable to execute the clean and close routines to ensure 
+that memory is properly released and that the log file stream is properly 
+closed and the log data saved.
+
 ## References
 
 MARCS bolometric correction tables computed for the entire grid of MARCS 
