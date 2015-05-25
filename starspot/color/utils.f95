@@ -31,7 +31,7 @@ module utils
 contains
     subroutine log_init(filename)
         character(len=*) :: filename
-        open(log_unit, file=trim(filename), status='new')
+        open(log_unit, file=trim(filename), status='unknown')
     end subroutine log_init
 
     subroutine log_warn(message)

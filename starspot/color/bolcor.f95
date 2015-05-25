@@ -43,8 +43,8 @@ contains
 
         real(dp), intent(in) :: feh, afe
 
-        character(len=15), intent(in) :: brand
-        character(len=5), dimension(:), intent(in) :: filters
+        character(len=*), intent(in) :: brand
+        character(len=*), dimension(:), intent(in) :: filters
 
         n_passbands = size(filters, 1)
         if (allocated(passbands) .eqv. .false.) allocate(passbands(n_passbands))
@@ -55,7 +55,7 @@ contains
         end do
 
         ! initialize bolometric correction tables
-        select case (bc_type)
+        select case (trim(bc_type))
             case ('marcs')
                 call marcs(feh, afe)
             case ('phx_amescond')

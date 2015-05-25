@@ -1,8 +1,8 @@
-# Bolometric Corrections and Color Transformations
+# Bolometric Corrections for Stellar Models 
 
-MARCS bolometric corrections and color transformation tables computed for the
-entire grid by Casagrande & VandenBerg (2014, MNRAS, 444, 392). Full routines
-and tables available at
+MARCS bolometric correction tables computed for the entire grid of MARCS 
+models (Gustafsson et al. 2008, A&A, 486, 951) by Casagrande & VandenBerg 
+(2014, MNRAS, 444, 392). Full routines and tables are available at
 
 ftp://cdsarc.u-strasbg.fr/pub/cats/J/MNRAS/444/392/
 
