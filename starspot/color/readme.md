@@ -1,5 +1,13 @@
 # Bolometric Corrections for Stellar Models 
 
+Stellar evolution models yield predictions of stellar fundamental properties 
+(radius, effective temperature, luminosity) as a function of time. While 
+this is useful data, most observations do not yield this information directly.
+Instead, observations measure the brightness of a star, or groups of stars,
+in particular wavelength regimes, isolated using filters that permit only
+certain wavelengths of light to pass through to the detector. It is therefore
+advantageous to convert stellar fundamental properties to direct photometric
+observables. This set of Fortran routines allows one to do just that.
 
 ## Compiling
 
