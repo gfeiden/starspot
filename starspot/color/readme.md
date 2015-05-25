@@ -85,15 +85,19 @@ http://stellar.dartmouth.edu/models/
 If you make use of this code, please cite the relevant publications and 
 note their contributions. 
 
-- Feiden (in prep.) --- creation and distribution of Dartmouth model isochrones for young stars, including colors and magnitudes.
+* Feiden (in prep.) --- creation and distribution of Dartmouth model isochrones for young stars, including colors and magnitudes.
 
-- Feiden & Christophe (in prep.) --- starspot modeling procedures.
+* Feiden & Christophe (in prep.) --- starspot modeling procedures.
 
-- Casagrande & VandenBerg ([2014, MNRAS, 444, 392](http://adsabs.harvard.edu/abs/2014MNRAS.444..392C)) --- Bolometric correction tables using MARCS atmosphere fluxes.
+* Casagrande & VandenBerg ([2014, MNRAS, 444, 392](http://adsabs.harvard.edu/abs/2014MNRAS.444..392C)) --- Bolometric correction tables using MARCS atmosphere fluxes.
 
-- Dotter et al. ([2008, ApJS, 178, 89](http://adsabs.harvard.edu/abs/2008ApJS..178...89D)) --- Bolometric correction tables using PHOENIX AMES-COND atmosphere fluxes.
+* Dotter et al. ([2008, ApJS, 178, 89](http://adsabs.harvard.edu/abs/2008ApJS..178...89D)) --- Bolometric correction tables using PHOENIX AMES-COND atmosphere fluxes.
 
-- Gustafsson et al. ([2008, A&A, 486, 951](http://adsabs.harvard.edu/abs/2008A%26A...486..951G)) --- Creation and distribution of the MARCS model atmosphere code and data products.
+* Gustafsson et al. ([2008, A&A, 486, 951](http://adsabs.harvard.edu/abs/2008A%26A...486..951G)) --- Creation and distribution of the MARCS model atmosphere code and data products.
 
-- Hauschildt et al. ([1999, ApJ, 512, 377](http://adsabs.harvard.edu/abs/1999ApJ...512..377H); [1999, ApJ,
+* Hauschildt et al. ([1999, ApJ, 512, 377](http://adsabs.harvard.edu/abs/1999ApJ...512..377H); [1999, ApJ,
 525, 871](http://adsabs.harvard.edu/abs/1999ApJ...525..871H)) --- Creation and distribution of the PHOENIX AMES-COND model atmosphere code and data products.
+
+Once the code is in a better and more user-friendly form, it will be provided
+with an official release version number (via GitHub) and a doi number through
+[Zenodo](http://www.zenodo.org). Stay tuned!
