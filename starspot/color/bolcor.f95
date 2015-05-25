@@ -33,8 +33,9 @@ module bolcorrection
     character(len=15) :: bc_type
     character(len=5), dimension(:), allocatable :: passbands
 
-    public  :: bc_init, bc_eval, bc_clean
-    private :: marcs, phoenix_amescond, vc_semiemp
+    ! f2py does not play well with private routines, all must be public
+    !private :: marcs, phoenix_amescond, vc_semiemp
+    !public  :: bc_init, bc_eval, bc_clean
 
 contains
 
@@ -45,6 +46,8 @@ contains
 
         character(len=*), intent(in) :: brand
         character(len=*), dimension(:), intent(in) :: filters
+
+!f2py intent(in) feh, afe, brand, filters
 
         n_passbands = size(filters, 1)
         if (allocated(passbands) .eqv. .false.) allocate(passbands(n_passbands))
@@ -80,6 +83,9 @@ contains
         real(dp), dimension(4) :: coeffs
         real(dp), dimension(:,:), allocatable :: bc_loggs
         real(dp), dimension(:), allocatable, intent(out) :: magnitudes
+
+!f2py intent(in) teff, logg, logl
+!f2py intent(out) magnitudes
 
         if (allocated(magnitudes) .eqv. .false.) then
             call log_note('allocating memory for magnitudes in bc_eval')

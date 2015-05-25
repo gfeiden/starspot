@@ -28,6 +28,9 @@ module utils
     integer, parameter :: qp = selected_real_kind(33, 4931)
     integer, parameter :: log_unit = 99
 
+    !private :: log_error, log_note, log_warn
+    !public  :: log_init, log_close
+
 contains
     subroutine log_init(filename)
         character(len=*) :: filename
