@@ -3,6 +3,13 @@
 
 ## Compiling
 
+To comiple directly for use in other Fortran programs, simply compile in
+the following order,
+
+```bash
+gfortran -o program utils.f95 interpolation.f95 bolcor.f95 example.f95 
+```
+
 Fortran 95 code included in this sub-package is written to be compatible with 
 the NumPy/SciPy package `f2py`, allowing the Fortran code to be wrapped natively
 into Python scripts. To compile and wrap the Fortran modules, execute the
@@ -24,6 +31,39 @@ routines.
 
 ## Usage
 
+Here is a quick example of how to use these routines in a Fortran program
+to compute bolometric correction for a single set of stellar parameters.
+
+```fortran
+program example
+    use utils
+    use bolcorrection
+    implicit none
+    
+    real(dp) :: feh = 0.0_dp, afe = 0.0_dp
+    real(dp) :: teff = 3000.0_dp, logg = 5.0_dp, logl = -2.65_dp
+    real(dp), dimension(8) :: magnitudes
+    
+    character(len=15) :: brand
+    character(len=1), dimension(8) :: filters = ['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
+    
+    ! initialize log file
+    call log_init('example.log')
+    
+    ! initialize bolometric correction table at fixed [Fe/H] and [a/Fe]
+    call bc_init(feh, afe, brand, filters)
+    
+    ! transform stellar parameters to UBVRIJHK magnitudes
+    call bc_eval(teff, logg, logl, size(filters, 1), magnitudes)
+    
+    ! release allocated memory and close log file
+    call bc_clean()
+    call log_close()
+
+end program example
+
+```
+
 Within a Python script, the Fortran routines can be called after importing
 the `bolcor` library. Modules and global variables are then accessible by 
 calling `bolcor.module_name` or `bolcor.global_var_name`, but often one wants 
@@ -40,9 +80,9 @@ bc.utils.log_init('example.log')
 # initialize bolometric correction table at fixed [Fe/H] and [a/Fe]
 Fe_H = 0.0          # iron abundance relative to solar
 A_Fe = 0.0          # alpha abundance relative to solar
-type = 'marcs'      # type of bolometric correction
+brand = 'marcs'     # type of bolometric correction
 filters = ['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
-bc.bolcorrection.bc_init(Fe_H, A_Fe, type, filters)
+bc.bolcorrection.bc_init(Fe_H, A_Fe, brand, filters)
 
 # transform stellar parameters into UBVRIJHK magnitudes
 Teff = 3000.0       # effective temperature, in K
