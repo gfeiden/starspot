@@ -1,7 +1,7 @@
 #
 #
 import numpy as np
-import color.bolcor as bc
+import bolcor as bc
 
 class Isochrone(object):
 	""" provides instance of Dartmouth stellar evolution isochrone """
@@ -24,15 +24,15 @@ class Isochrone(object):
 		log_g = isodata[2]
 		log_L = isodata[3]
 		log_R = isodata[4]
-		A_Li = isodata[5]
-		return isodata, m, Teff, log_g, log_L, log_R, A_Li
+		a_Li = isodata[5]
+		return isodata, m, Teff, log_g, log_L, log_R, a_Li
 
 	def unload(self):
 		""" """
 
-	def colorize(self,Teff,logg,logL):
+	def colorize(self,Teff,log_g,log_L):
 		""" calculates magnitudes from isochrone data """
-        # initialize log file
+	   	# initialize log file
 		bc.utils.log_init('example.log')
 		
 		# initialize bolometric correction table at fixed [Fe/H] and [a/Fe]
@@ -41,8 +41,8 @@ class Isochrone(object):
 		bc.bolcorrection.bc_init(self.Fe_H, self.a_Fe, brand, filters)
 		
 		# transform stellar parameters into UBVRIJHK magnitudes
-		magnitudes = bc.bolcorrection.bc_eval(Teff, logg, logL, len(filters))
-		
+		magnitudes = bc.bolcorrection.bc_eval(Teff, log_g, log_L, len(filters))
+			
 		# release allocated memory and close log file
 		bc.bolcorrection.bc_clean()
 		bc.utils.log_close()
@@ -73,7 +73,7 @@ class Isochrone(object):
 		for i in np.arange(len(m)):
 			magfile.write('    '+str(m[i])+'    '+str(Tavg[i])+'    '+
 						str(nlog_g[i])+'    '+str(nlog_L[i])+'    '+
-						str(nlog_R[i])+'    '+str(A_Li[i])+'   '+
+						str(nlog_R[i])+'    '+str(a_Li[i])+'   '+
 						str(B[i])+'    '+str(V[i])+'    '+str(R[i])+'    '+
 						str(I[i])+'    '+str(J[i])+'    '+str(H[i])+'    '+
 						str(K[i])+'\n')
@@ -115,3 +115,4 @@ class MassTrack(object):
 
 	def unload(self):
 		""" """
+
