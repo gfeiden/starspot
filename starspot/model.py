@@ -6,11 +6,11 @@ from astropy import constants as const
 import bolcor as bc
 
 #Constants
-G=const.G.value
-L_sun=const.L_sun.value
-M_sun=const.M_sun.value
-R_sun=const.R_sun.value
-sigma=const.sigma_sb.value
+G=const.G.cgs.value
+L_sun=const.L_sun.cgs.value
+M_sun=const.M_sun.cgs.value
+R_sun=const.R_sun.cgs.value
+sigma=const.sigma_sb.cgs.value
 
 class Isochrone(object):
 	""" provides instance of Dartmouth stellar evolution isochrone """
