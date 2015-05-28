@@ -1,7 +1,16 @@
 #
 #
 import numpy as np
+from astropy import constants as const
+
 import bolcor as bc
+
+#Constants
+G=const.G.value
+L_sun=const.L_sun.value
+M_sun=const.M_sun.value
+R_sun=const.R_sun.value
+sigma=const.sigma_sb.value
 
 class Isochrone(object):
 	""" provides instance of Dartmouth stellar evolution isochrone """
@@ -25,14 +34,40 @@ class Isochrone(object):
 		log_L = isodata[3]
 		log_R = isodata[4]
 		a_Li = isodata[5]
-		return isodata, m, Teff, log_g, log_L, log_R, a_Li
+		return isodata, Teff, log_g, log_L
 
 	def unload(self):
 		""" """
 
-	def spot(self):
-		""" """
-		return isodata_spots
+	def add_spots(self,isodata,spots_params):
+		""" adds spots to isochrone models assuming a two-temperature model """
+		m = isodata[0]
+		Teff = isodata[1]
+		log_g = isodata[2]
+		log_L = isodata[3]
+		log_R = isodata[4]
+		a_Li = isodata[5]
+
+		zeta=spots_params[0]
+		epsilon=spots_params[1]
+		rho=spots_params[2]
+		pi=spots_params[3]
+		
+		nlog_L=np.log10(zeta)+log_L
+		nlog_R=np.log10(epsilon)+log_R
+		nR=10**nlog_R
+		nlog_g=np.log10(G*m*M_sun/(R_sun*nR)**2)
+		Sphot=4*np.pi*rho*(R_sun*nR)**2
+		Sspot=4*np.pi*(1-rho)*(R_sun*nR)**2
+		Tphot=Teff*(zeta/(epsilon*(1-rho*(1-pi**4))))**0.25
+		Tspot=pi*Tphot
+		log_Lphot=np.log10((sigma*Sphot*Tphot**4)/L_sun)
+		log_Lspot=np.log10((sigma*Sspot*Tspot**4)/L_sun)
+		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*R_sun*nR))**0.25
+
+		isodata_spots=np.vstack((m, Tavg, nlog_g, nlog_L, nlog_R, a_Li, Tphot,
+				Tspot, log_Lphot, log_Lspot))
+		return isodata_spots, nlog_g, Tphot, log_Lphot, Tspot, log_Lspot
 
 	def colorize(self,Teff,log_g,log_L):
 		""" calculates magnitudes from isochrone data """
