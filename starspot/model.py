@@ -54,11 +54,11 @@ class Isochrone(object):
 		pi=spots_params[3]
 		
 		nlog_L=np.log10(zeta)+log_L
-		nlog_R=np.log10(epsilon)+log_R
+		nlog_R=0.5*np.log10(epsilon)+log_R
 		nR=10**nlog_R
 		nlog_g=np.log10(G*m*M_sun/(R_sun*nR)**2)
-		Sphot=4*np.pi*rho*(R_sun*nR)**2
-		Sspot=4*np.pi*(1-rho)*(R_sun*nR)**2
+		Sphot=4*np.pi*(1-rho)*(R_sun*nR)**2
+		Sspot=4*np.pi*rho*(R_sun*nR)**2
 		Tphot=Teff*(zeta/(epsilon*(1-rho*(1-pi**4))))**0.25
 		Tspot=pi*Tphot
 		log_Lphot=np.log10((sigma*Sphot*Tphot**4)/L_sun)
@@ -110,7 +110,7 @@ class Isochrone(object):
 				'age = '+str("%.1f" % self.age)+'    '+
 				'[Fe/H] = '+str("%.2f" % self.Fe_H)+'    '+
 				'a(Fe) = '+str("%.2f" % self.a_Fe)+'    '+
-				'\n'+'#'+'    '+
+				'\n'+'#'+'\n'+'#'+'    '+
 				'Mass'+'    '+'Teff'+'    '+
 				'log(g)'+'    '+'log_L'+'    '+
 				'log(R)'+'    '+'A(Li)'+'    '+
@@ -125,7 +125,7 @@ class Isochrone(object):
 					str(U[i])+'    '+str(B[i])+'    '+str(V[i])+'    '+
 					str(R[i])+'    '+str(I[i])+'    '+str(J[i])+'    '+
 					str(H[i])+'    '+str(K[i])+'\n')
-		magfile.close()
+		isofile.close()
 
 	def save_spotted(self,spots_params,isodata_spots,magnitudes_spots):
 		""" """
@@ -134,8 +134,8 @@ class Isochrone(object):
 		rho=spots_params[2]
 		pi=spots_params[3]
 		#Creates a file with data comparable to observations. Included :
-        # m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
-        # U B V Rc Ic J H K (2MASS)
+		# m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
+		# U B V Rc Ic J H K (2MASS)
 		m=isodata_spots[0]
 		Tavg=isodata_spots[1]
 		nlog_g=isodata_spots[2]
