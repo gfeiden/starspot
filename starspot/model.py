@@ -29,7 +29,7 @@ class Isochrone(object):
 				"%.1f" % self.age, "%.2f" % self.Fe_H, "%.2f" % self.a_Fe)
 		isodata = np.genfromtxt(isofile,unpack=True)
 		m = isodata[0]
-		Teff = isodata[1]
+		Teff = 10**isodata[1]
 		log_g = isodata[2]
 		log_L = isodata[3]
 		log_R = isodata[4]
@@ -42,7 +42,7 @@ class Isochrone(object):
 	def add_spots(self,isodata,spots_params):
 		""" adds spots to isochrone models assuming a two-temperature model """
 		m = isodata[0]
-		Teff = isodata[1]
+		Teff = 10**isodata[1]
 		log_g = isodata[2]
 		log_L = isodata[3]
 		log_R = isodata[4]
@@ -63,7 +63,7 @@ class Isochrone(object):
 		Tspot=pi*Tphot
 		log_Lphot=np.log10((sigma*Sphot*Tphot**4)/L_sun)
 		log_Lspot=np.log10((sigma*Sspot*Tspot**4)/L_sun)
-		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*R_sun*nR))**0.25
+		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*(R_sun*nR)**2))**0.25
 
 		isodata_spots=np.vstack((m, Tavg, nlog_g, nlog_L, nlog_R, a_Li, Tphot,
 				Tspot, log_Lphot, log_Lspot))
@@ -91,7 +91,7 @@ class Isochrone(object):
 	def save_unspotted(self,isodata,magnitudes):
 		""" """
 		m = isodata[0]
-		Teff = isodata[1]
+		Teff = 10**isodata[1]
 		log_g = isodata[2]
 		log_L = isodata[3]
 		log_R = isodata[4]
