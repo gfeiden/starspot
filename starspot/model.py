@@ -60,12 +60,19 @@ class Isochrone(object):
 		nlog_R=0.5*np.log10(epsilon)+log_R
 		nR=10**nlog_R
 		nlog_g=np.log10(G*m*M_sun/(R_sun*nR)**2)
-		Sphot=4*np.pi*(1-rho)*(R_sun*nR)**2
-		Sspot=4*np.pi*rho*(R_sun*nR)**2
+
 		Tphot=Teff*(zeta/(epsilon*(1-rho*(1-pi**4))))**0.25
-		Tspot=pi*Tphot
+		Sphot=4*np.pi*(1-rho)*(R_sun*nR)**2
 		log_Lphot=np.log10((sigma*Sphot*Tphot**4)/L_sun)
-		log_Lspot=np.log10((sigma*Sspot*Tspot**4)/L_sun)
+
+		Tspot=pi*Tphot
+		if rho==0 :
+			log_Lspot=np.zeros(len(m))
+			log_Lspot.fill(np.nan)
+		else :
+			Sspot=4*np.pi*rho*(R_sun*nR)**2
+			log_Lspot=np.log10((sigma*Sspot*Tspot**4)/L_sun)
+
 		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*(R_sun*nR)**2))**0.25
 
 		isodata_spots=np.vstack((m, Tavg, nlog_g, nlog_L, nlog_R, a_Li, Tphot,

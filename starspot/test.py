@@ -27,7 +27,7 @@ isochrone.save_unspotted(isodata,magnitudes)
 
 zeta=np.arange(1,2)	#luminosity ratio
 epsilon=np.arange(1,2)	#surface ratio
-rho=np.arange(0.001,1)	#spot coverage
+rho=np.arange(0,1)	#spot coverage
 pi=np.arange(1,2) #Tspot/Tphot
 
 for m in np.arange(len(zeta)) :
@@ -41,17 +41,24 @@ for m in np.arange(len(zeta)) :
 
 				#Compute magnitudes of spotted stars
 				magnitudes_spots=[]
-				for i in np.arange(len(Tspot)):
-					if i == 0:
-						magnitudes_spots =isochrone.colorize(Tspot[i],
+				for i in np.arange(len(Tphot)):
+					if i == 0 and rho != 0 :
+						magnitudes_spots = isochrone.colorize(Tspot[i],
 								nlog_g[i],log_Lspot[i]) + \
 								isochrone.colorize(Tphot[i],nlog_g[i],
 								log_Lphot[i])
-					else:
+					elif i != 0 and rho != 0 :
 						magnitudes_spots = np.column_stack((magnitudes_spots,
 								isochrone.colorize(Tspot[i],nlog_g[i],
 								log_Lspot[i]) +	isochrone.colorize(Tphot[i],
 								nlog_g[i],log_Lphot[i])))
+					elif i == 0 :
+						magnitudes_spots = isochrone.colorize(Tphot[i],
+								nlog_g[i],log_Lphot[i])
+					else :
+						magnitudes_spots = np.column_stack((magnitudes_spots,
+								isochrone.colorize(Tphot[i],nlog_g[i],
+								log_Lphot[i])))
 
 				#Save spotted isochrone
 				isochrone.save_spotted(spots_params,isodata_spots,
