@@ -3,7 +3,10 @@
 import numpy as np
 from astropy import constants as const
 
-import bolcor as bc
+from os import mkdir
+from os.path import exists
+
+import color.bolcor as bc
 
 #Constants
 G=const.G.cgs.value
@@ -25,7 +28,7 @@ class Isochrone(object):
 
 	def load(self):
 		""" loads data from isochrone models """
-		isofile = 'dmestar_00{}myr_z+{}_a+{}_marcs.iso'.format(
+		isofile = 'isochrones/dmestar_00{}myr_z+{}_a+{}_marcs.iso'.format(
 				"%.1f" % self.age, "%.2f" % self.Fe_H, "%.2f" % self.a_Fe)
 		isodata = np.genfromtxt(isofile,unpack=True)
 		m = isodata[0]
@@ -105,8 +108,16 @@ class Isochrone(object):
 		J=magnitudes[5]
 		H=magnitudes[6]
 		K=magnitudes[7]
-		isofile=open('isochrone_{}myr_z+{}_a+{}_marcs.iso'.format(
-				"%.1f" % self.age, "%.2f" % self.Fe_H, "%.2f" % self.a_Fe),'w')
+
+		if exists('age_{}+z_{}'.format("%.1f" % self.age, 
+				"%.2f" % self.Fe_H))==False:
+			mkdir('age_{}+z_{}'.format("%.1f" % self.age, 
+				"%.2f" % self.Fe_H))
+
+		isofile=open('age_{}+z_{}/isochrone_{}myr_z+{}_a+{}_marcs.iso'.format(
+				"%.1f" % self.age, "%.2f" % self.Fe_H,
+				"%.1f" % self.age, "%.2f" % self.Fe_H, 
+				"%.2f" % self.a_Fe),'w')
 		isofile.write('#'+'\n'+'#'+'    '+
 				'age = '+str("%.1f" % self.age)+'    '+
 				'[Fe/H] = '+str("%.2f" % self.Fe_H)+'    '+
@@ -166,8 +177,15 @@ class Isochrone(object):
 		J=magnitudes_spots[5]
 		H=magnitudes_spots[6]
 		K=magnitudes_spots[7]
-		magfile = open('mag_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(zeta,
-                       epsilon, rho, pi), 'w')
+
+		if exists('age_{}+z_{}'.format("%.1f" % self.age, 
+				"%.2f" % self.Fe_H))==False:
+			mkdir('age_{}+z_{}'.format("%.1f" % self.age, 
+				"%.2f" % self.Fe_H))
+
+		magfile = open('age_{}+z_{}/mag_zet+{}_eps+{}_rho+{}_pi+{}.dat'\
+				.format("%.1f" % self.age, "%.2f" % self.Fe_H,zeta, epsilon, 
+				rho, pi), 'w')
 		magfile.write('#'+'\n'+'#'+'    '+
 				'zeta = '+str(zeta)+'    '+
 				'epsilon = '+str(epsilon)+'    '+
@@ -212,8 +230,9 @@ class Isochrone(object):
 		log_Tspot=np.log10(isodata_spots[7])
 		log_Lphot=isodata_spots[8]
 		log_Lspot=isodata_spots[9]
-		modfile = open('spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(zeta,
-                       epsilon, rho, pi), 'w')
+		modfile = open('age_{}+z_{}/spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'\
+				.format("%.1f" % self.age, "%.2f" % self.Fe_H, zeta, epsilon, 
+				rho, pi), 'w')
 		modfile.write('#'+'\n'+'#'+'    '+
 				'zeta = '+str(zeta)+'    '+
 				'epsilon = '+str(epsilon)+'    '+
