@@ -80,7 +80,8 @@ class Isochrone(object):
 		bc.bolcorrection.bc_init(self.Fe_H, self.a_Fe, brand, filters)
 		
 		# transform stellar parameters into UBVRIJHK magnitudes
-		magnitudes = bc.bolcorrection.bc_eval(Teff, log_g, log_L, len(filters))
+		magnitudes = bc.bolcorrection.bc_eval(Teff, log_g, log_L, 
+				len(filters))
 			
 		# release allocated memory and close log file
 		bc.bolcorrection.bc_clean()
@@ -91,7 +92,7 @@ class Isochrone(object):
 	def save_unspotted(self,isodata,magnitudes):
 		""" """
 		m = isodata[0]
-		Teff = 10**isodata[1]
+		log_Teff = isodata[1]
 		log_g = isodata[2]
 		log_L = isodata[3]
 		log_R = isodata[4]
@@ -110,21 +111,36 @@ class Isochrone(object):
 				'age = '+str("%.1f" % self.age)+'    '+
 				'[Fe/H] = '+str("%.2f" % self.Fe_H)+'    '+
 				'a(Fe) = '+str("%.2f" % self.a_Fe)+'    '+
-				'\n'+'#'+'\n'+'#'+'    '+
-				'Mass'+'    '+'Teff'+'    '+
-				'log(g)'+'    '+'log_L'+'    '+
-				'log(R)'+'    '+'A(Li)'+'    '+
-				'U'+'    '+'B'+'    '+'V'+'    '+
-				'Rc'+'    '+'Ic'+'    '+
-				'J'+'    '+'H'+'    '+
-				'K'+'    '+'\n')
+				'\n'+'#'+'\n'+'#'+'     '+
+				'Mass'+'          '+
+				'log(Teff)'+'     '+
+				'log(g)'+'       '+
+				'log(L)'+'        '+
+				'log(R)'+'        '+
+				'A(Li)'+'        '+
+				'U'+'             '+
+				'B'+'             '+
+				'V'+'             '+
+				'Rc'+'            '+
+				'Ic'+'             '+
+				'J'+'             '+
+				'H'+'             '+
+				'K'+'\n')
 		for i in np.arange(len(m)):
-			isofile.write('    '+str(m[i])+'    '+str(Teff[i])+'    '+
-					str(log_g[i])+'    '+str(log_L[i])+'    '+
-					str(log_R[i])+'    '+str(a_Li[i])+'   '+
-					str(U[i])+'    '+str(B[i])+'    '+str(V[i])+'    '+
-					str(R[i])+'    '+str(I[i])+'    '+str(J[i])+'    '+
-					str(H[i])+'    '+str(K[i])+'\n')
+			isofile.write('    '+str("%10.6f" % m[i])+'    '+
+					str("%10.6f" % log_Teff[i])+'    '+
+					str("%10.6f" % log_g[i])+'    '+
+					str("%10.6f" % log_L[i])+'    '+
+					str("%10.6f" % log_R[i])+'    '+
+					str("%10.6f" % a_Li[i])+'   '+
+					str("%10.6f" % U[i])+'    '+
+					str("%10.6f" % B[i])+'    '+
+					str("%10.6f" % V[i])+'    '+
+					str("%10.6f" % R[i])+'    '+
+					str("%10.6f" % I[i])+'    '+
+					str("%10.6f" % J[i])+'    '+
+					str("%10.6f" % H[i])+'    '+
+					str("%10.6f" % K[i])+'\n')
 		isofile.close()
 
 	def save_spotted(self,spots_params,isodata_spots,magnitudes_spots):
@@ -137,7 +153,7 @@ class Isochrone(object):
 		# m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
 		# U B V Rc Ic J H K (2MASS)
 		m=isodata_spots[0]
-		Tavg=isodata_spots[1]
+		log_Tavg=np.log10(isodata_spots[1])
 		nlog_g=isodata_spots[2]
 		nlog_L=isodata_spots[3]
 		nlog_R=isodata_spots[4]
@@ -157,28 +173,43 @@ class Isochrone(object):
 				'epsilon = '+str(epsilon)+'    '+
 				'rho = '+str(rho)+'    '+
 				'pi = '+str(pi)+
-				'\n'+'#'+'\n'+'#'+'   '+
-				'Mass'+'    '+'T_average'+'    '+
-				'log(g)'+'    '+'log(L)'+'    '+
-				'log(R)'+'    '+'A(Li)'+'    '+
-				'U'+'    '+'B'+'    '+'V'+'    '+
-				'Rc'+'    '+'Ic'+'    '+
-				'J'+'    '+'H'+'    '+
-				'K'+'    '+'\n')
+				'\n'+'#'+'\n'+'#'+'     '+
+				'Mass'+'          '+
+				'log(Tavg)'+'     '+
+				'log(g)'+'       '+
+				'log(L)'+'        '+
+				'log(R)'+'        '+
+				'A(Li)'+'        '+
+				'U'+'             '+
+				'B'+'             '+
+				'V'+'             '+
+				'Rc'+'            '+
+				'Ic'+'             '+
+				'J'+'             '+
+				'H'+'             '+
+				'K'+'\n')
 		for i in np.arange(len(m)):
-			magfile.write('    '+str(m[i])+'    '+str(Tavg[i])+'    '+
-					str(nlog_g[i])+'    '+str(nlog_L[i])+'    '+
-					str(nlog_R[i])+'    '+str(a_Li[i])+'   '+
-					str(U[i])+'    '+str(B[i])+'    '+str(V[i])+'    '+
-					str(R[i])+'    '+str(I[i])+'    '+str(J[i])+'    '+
-					str(H[i])+'    '+str(K[i])+'\n')
+			magfile.write('    '+str("%10.6f" % m[i])+'    '+
+					str("%10.6f" % log_Tavg[i])+'    '+
+					str("%10.6f" % nlog_g[i])+'    '+
+					str("%10.6f" % nlog_L[i])+'    '+
+					str("%10.6f" % nlog_R[i])+'    '+
+					str("%10.6f" % a_Li[i])+'   '+
+					str("%10.6f" % U[i])+'    '+
+					str("%10.6f" % B[i])+'    '+
+					str("%10.6f" % V[i])+'    '+
+					str("%10.6f" % R[i])+'    '+
+					str("%10.6f" % I[i])+'    '+
+					str("%10.6f" % J[i])+'    '+
+					str("%10.6f" % H[i])+'    '+
+					str("%10.6f" % K[i])+'\n')
 		magfile.close()
 
 		#Creates a file with data related to spot modelisation. Included :
 		# m, Tphot, Tspot, log_Lphot, log_Lspot
 		m=isodata_spots[0]
-		Tphot=isodata_spots[6]
-		Tspot=isodata_spots[7]
+		log_Tphot=np.log10(isodata_spots[6])
+		log_Tspot=np.log10(isodata_spots[7])
 		log_Lphot=isodata_spots[8]
 		log_Lspot=isodata_spots[9]
 		modfile = open('spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'.format(zeta,
@@ -188,14 +219,18 @@ class Isochrone(object):
 				'epsilon = '+str(epsilon)+'    '+
 				'rho = '+str(rho)+'    '+
 				'pi = '+str(pi)+
-				'\n'+'#'+'\n'+'#'+'    '+
-				'Mass'+'    '+'T_phot'+'    '+
-				'T_spot'+'    '+'log(L_phot)'+'    '+
-				'log(L_spot)'+'   '+'\n')
+				'\n'+'#'+'\n'+'#'+'     '+
+				'Mass'+'          '+
+				'log(T_phot)'+'   '+
+				'log(T_spot)'+'  '+
+				'log(L_phot)'+'   '+
+				'log(L_spot)'+'\n')
 		for i in np.arange(len(m)):
-			modfile.write('    '+str(m[i])+'    '+str(Tphot[i])+'    '+
-					str(Tspot[i])+'    '+str(log_Lphot[i])+'    '+
-					str(log_Lspot[i])+'\n')
+			modfile.write('    '+str("%10.6f" % m[i])+'    '+
+					str("%10.6f" % log_Tphot[i])+'    '+
+					str("%10.6f" % log_Tspot[i])+'    '+
+					str("%10.6f" % log_Lphot[i])+'    '+
+					str("%10.6f" % log_Lspot[i])+'\n')
 		modfile.close()
         
 
