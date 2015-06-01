@@ -195,13 +195,13 @@ contains
         real(dp), dimension(:,:,:,:), allocatable :: bc_tables
 
         if (afe < -10.0) then
-            directory = 'tab/std/'
+            directory = 'color/tab/std/'
         else if (afe < -0.2) then
-            directory = 'tab/m04/'
+            directory = 'color/tab/m04/'
         else if (afe < 0.2) then
-            directory = 'tab/p00/'
+            directory = 'color/tab/p00/'
         else if (afe < 0.4) then
-            directory = 'tab/p04/'
+            directory = 'color/tab/p04/'
         else
             call log_warn('strange [a/Fe] requested. default to standard')
             directory = 'tab/std/'
