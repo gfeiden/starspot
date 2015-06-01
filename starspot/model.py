@@ -55,16 +55,18 @@ class Isochrone(object):
 		epsilon=spots_params[1]
 		rho=spots_params[2]
 		pi=spots_params[3]
-		
+
+		# properties of stars
 		nlog_L=np.log10(zeta)+log_L
 		nlog_R=0.5*np.log10(epsilon)+log_R
 		nR=10**nlog_R
 		nlog_g=np.log10(G*m*M_sun/(R_sun*nR)**2)
-
+		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*(R_sun*nR)**2))**0.25
+		# photosphere
 		Tphot=Teff*(zeta/(epsilon*(1-rho*(1-pi**4))))**0.25
 		Sphot=4*np.pi*(1-rho)*(R_sun*nR)**2
 		log_Lphot=np.log10((sigma*Sphot*Tphot**4)/L_sun)
-
+		# spots
 		Tspot=pi*Tphot
 		if rho==0 :
 			log_Lspot=np.zeros(len(m))
@@ -72,9 +74,7 @@ class Isochrone(object):
 		else :
 			Sspot=4*np.pi*rho*(R_sun*nR)**2
 			log_Lspot=np.log10((sigma*Sspot*Tspot**4)/L_sun)
-
-		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*(R_sun*nR)**2))**0.25
-
+		# makes an array of all computed data
 		isodata_spots=np.vstack((m, Tavg, nlog_g, nlog_L, nlog_R, a_Li, Tphot,
 				Tspot, log_Lphot, log_Lspot))
 		return isodata_spots, nlog_g, Tphot, log_Lphot, Tspot, log_Lspot
@@ -115,7 +115,7 @@ class Isochrone(object):
 		J=magnitudes[5]
 		H=magnitudes[6]
 		K=magnitudes[7]
-
+		# creates the directory where data will be saved if needed
 		if exists('age_{}+z_{}'.format("%.1f" % self.age, 
 				"%.2f" % self.Fe_H))==False:
 			mkdir('age_{}+z_{}'.format("%.1f" % self.age, 
@@ -167,7 +167,7 @@ class Isochrone(object):
 		epsilon=spots_params[1]
 		rho=spots_params[2]
 		pi=spots_params[3]
-		#Creates a file with data comparable to observations. Included :
+		# creates a file with data comparable to observations. Included :
 		# m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
 		# U B V Rc Ic J H K (2MASS)
 		m=isodata_spots[0]
@@ -184,7 +184,7 @@ class Isochrone(object):
 		J=magnitudes_spots[5]
 		H=magnitudes_spots[6]
 		K=magnitudes_spots[7]
-
+		# creates the directory where data will be saved if needed
 		if exists('age_{}+z_{}'.format("%.1f" % self.age, 
 				"%.2f" % self.Fe_H))==False:
 			mkdir('age_{}+z_{}'.format("%.1f" % self.age, 
@@ -230,7 +230,7 @@ class Isochrone(object):
 					str("%10.6f" % K[i])+'\n')
 		magfile.close()
 
-		#Creates a file with data related to spot modelisation. Included :
+		# creates a file with data related to spot modelisation. Included :
 		# m, Tphot, Tspot, log_Lphot, log_Lspot
 		m=isodata_spots[0]
 		log_Tphot=np.log10(isodata_spots[6])
