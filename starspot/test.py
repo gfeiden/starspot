@@ -42,24 +42,20 @@ for m in np.arange(len(zeta)) :
 				#Compute magnitudes of spotted stars
 				magnitudes_spots=[]
 				for i in np.arange(len(Tphot)):
-					if i == 0 and rho != 0 :
-						magnitudes_spots = isochrone.colorize(Tspot[i],
-								nlog_g[i],log_Lspot[i]) + \
-								isochrone.colorize(Tphot[i],nlog_g[i],
-								log_Lphot[i])
-					elif i != 0 and rho != 0 :
+					if i != 0 and rho != 0 :
 						magnitudes_spots = np.column_stack((magnitudes_spots,
 								isochrone.colorize(Tspot[i],nlog_g[i],
 								log_Lspot[i]) +	isochrone.colorize(Tphot[i],
 								nlog_g[i],log_Lphot[i])))
-					elif i == 0 :
-						magnitudes_spots = isochrone.colorize(Tphot[i],
-								nlog_g[i],log_Lphot[i])
-					else :
-						magnitudes_spots = np.column_stack((magnitudes_spots,
+					elif i == 0 and rho != 0 :
+						magnitudes_spots = isochrone.colorize(Tspot[i],
+								nlog_g[i],log_Lspot[i]) + \
 								isochrone.colorize(Tphot[i],nlog_g[i],
-								log_Lphot[i])))
-
+								log_Lphot[i])
+					elif i == 0 :
+						magnitudes_spots = magnitudes
+					else :
+						magnitudes_spots = magnitudes
 				#Save spotted isochrone
 				isochrone.save_spotted(spots_params,isodata_spots,
 						magnitudes_spots)
