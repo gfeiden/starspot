@@ -191,8 +191,9 @@ class Isochrone(object):
 				"%.2f" % self.Fe_H))
 
 		magfile = open('age_{}+z_{}/mag_zet+{}_eps+{}_rho+{}_pi+{}.dat'\
-				.format("%.1f" % self.age, "%.2f" % self.Fe_H,zeta, epsilon, 
-				rho, pi), 'w')
+				.format("%.1f" % self.age, "%.2f" % self.Fe_H,
+				"%.2f" % zeta, "%.2f" % epsilon, "%.2f" % rho,
+				"%.2f" % pi), 'w')
 		magfile.write('#'+'\n'+'#'+'    '+
 				'zeta = '+str(zeta)+'    '+
 				'epsilon = '+str(epsilon)+'    '+
@@ -238,8 +239,9 @@ class Isochrone(object):
 		log_Lphot=isodata_spots[8]
 		log_Lspot=isodata_spots[9]
 		modfile = open('age_{}+z_{}/spots_zet+{}_eps+{}_rho+{}_pi+{}.dat'\
-				.format("%.1f" % self.age, "%.2f" % self.Fe_H, zeta, epsilon, 
-				rho, pi), 'w')
+				.format("%.1f" % self.age, "%.2f" % self.Fe_H, 
+				"%.2f" % zeta, "%.2f" % epsilon, "%.2f" % rho,
+				"%.2f" % pi), 'w')
 		modfile.write('#'+'\n'+'#'+'    '+
 				'zeta = '+str(zeta)+'    '+
 				'epsilon = '+str(epsilon)+'    '+
