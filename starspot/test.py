@@ -3,12 +3,20 @@
 from model import *
 
 #Loading isochrone
-age=120	
-Fe_H=0
+age=120.0
+Fe_H=0.0
+a_Fe=0.0
 
 isochrone=Isochrone(age,Fe_H)
 isodata, Teff, log_g, log_L = isochrone.load()
 
+# initialize log file
+bc.utils.log_init('example.log')
+
+# initialize bolometric correction table at fixed [Fe/H] and [a/Fe]
+brand='marcs'
+filters=['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
+bc.bolcorrection.bc_init(Fe_H, a_Fe, brand, filters)
 
 #Compute magnitudes
 magnitudes=[]
@@ -27,8 +35,8 @@ isochrone.save_unspotted(isodata,magnitudes)
 
 zeta=np.arange(1,2)	#luminosity ratio
 epsilon=np.arange(1,2)	#surface ratio
-rho=np.arange(0,1)	#spot coverage
-pi=np.arange(1,2) #Tspot/Tphot
+rho=np.arange(0,1,0.1)	#spot coverage
+pi=np.arange(0.6,1,0.1) #Tspot/Tphot
 
 for m in np.arange(len(zeta)) :
 	for n in np.arange(len(epsilon)) :
@@ -42,12 +50,12 @@ for m in np.arange(len(zeta)) :
 				#Compute magnitudes of spotted stars
 				magnitudes_spots=[]
 				for i in np.arange(len(Tphot)):
-					if i != 0 and rho != 0 :
+					if i != 0 and rho[p] != 0 :
 						magnitudes_spots = np.column_stack((magnitudes_spots,
 								isochrone.colorize(Tspot[i],nlog_g[i],
 								log_Lspot[i]) +	isochrone.colorize(Tphot[i],
 								nlog_g[i],log_Lphot[i])))
-					elif i == 0 and rho != 0 :
+					elif i == 0 and rho[p] != 0 :
 						magnitudes_spots = isochrone.colorize(Tspot[i],
 								nlog_g[i],log_Lspot[i]) + \
 								isochrone.colorize(Tphot[i],nlog_g[i],
@@ -59,3 +67,7 @@ for m in np.arange(len(zeta)) :
 				#Save spotted isochrone
 				isochrone.save_spotted(spots_params,isodata_spots,
 						magnitudes_spots)
+
+# release allocated memory and close log file
+bc.bolcorrection.bc_clean()
+bc.utils.log_close()

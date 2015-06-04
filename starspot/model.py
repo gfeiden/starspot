@@ -81,21 +81,13 @@ class Isochrone(object):
 
 	def colorize(self,Teff,log_g,log_L):
 		""" calculates magnitudes from isochrone data """
-	   	# initialize log file
-		bc.utils.log_init('example.log')
-		
-		# initialize bolometric correction table at fixed [Fe/H] and [a/Fe]
-		brand='marcs'
+
 		filters=['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
-		bc.bolcorrection.bc_init(self.Fe_H, self.a_Fe, brand, filters)
-		
 		# transform stellar parameters into UBVRIJHK magnitudes
 		magnitudes = bc.bolcorrection.bc_eval(Teff, log_g, log_L, 
 				len(filters))
 			
-		# release allocated memory and close log file
-		bc.bolcorrection.bc_clean()
-		bc.utils.log_close()
+
 
 		return magnitudes
 
