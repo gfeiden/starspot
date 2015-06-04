@@ -10,10 +10,10 @@ import color.bolcor as bc
 
 #Constants
 G=const.G.cgs.value
-L_sun=const.L_sun.cgs.value
-M_sun=const.M_sun.cgs.value
-R_sun=const.R_sun.cgs.value
-sigma=const.sigma_sb.cgs.value
+L_SUN=const.L_sun.cgs.value
+M_SUN=const.M_sun.cgs.value
+R_SUN=const.R_sun.cgs.value
+SIGMA=const.sigma_sb.cgs.value
 
 class Isochrone(object):
 	""" provides instance of Dartmouth stellar evolution isochrone """
@@ -60,20 +60,20 @@ class Isochrone(object):
 		nlog_L=np.log10(zeta)+log_L
 		nlog_R=0.5*np.log10(epsilon)+log_R
 		nR=10**nlog_R
-		nlog_g=np.log10(G*m*M_sun/(R_sun*nR)**2)
-		Tavg=(L_sun*10**nlog_L/(4*np.pi*sigma*(R_sun*nR)**2))**0.25
+		nlog_g=np.log10(G*m*M_SUN/(R_SUN*nR)**2)
+		Tavg=(L_SUN*10**nlog_L/(4*np.pi*SIGMA*(R_SUN*nR)**2))**0.25
 		# photosphere
 		Tphot=Teff*(zeta/(epsilon*(1-rho*(1-pi**4))))**0.25
-		Sphot=4*np.pi*(1-rho)*(R_sun*nR)**2
-		log_Lphot=np.log10((sigma*Sphot*Tphot**4)/L_sun)
+		Sphot=4*np.pi*(1-rho)*(R_SUN*nR)**2
+		log_Lphot=np.log10((SIGMA*Sphot*Tphot**4)/L_SUN)
 		# spots
 		Tspot=pi*Tphot
 		if rho==0 :
 			log_Lspot=np.zeros(len(m))
 			log_Lspot.fill(np.nan)
 		else :
-			Sspot=4*np.pi*rho*(R_sun*nR)**2
-			log_Lspot=np.log10((sigma*Sspot*Tspot**4)/L_sun)
+			Sspot=4*np.pi*rho*(R_SUN*nR)**2
+			log_Lspot=np.log10((SIGMA*Sspot*Tspot**4)/L_SUN)
 		# makes an array of all computed data
 		isodata_spots=np.vstack((m, Tavg, nlog_g, nlog_L, nlog_R, a_Li, Tphot,
 				Tspot, log_Lphot, log_Lspot))
@@ -81,14 +81,10 @@ class Isochrone(object):
 
 	def colorize(self,Teff,log_g,log_L):
 		""" calculates magnitudes from isochrone data """
-
 		filters=['U', 'B', 'V', 'R', 'I', 'J', 'H', 'K']
 		# transform stellar parameters into UBVRIJHK magnitudes
 		magnitudes = bc.bolcorrection.bc_eval(Teff, log_g, log_L, 
 				len(filters))
-			
-
-
 		return magnitudes
 
 	def save_unspotted(self,isodata,magnitudes):
