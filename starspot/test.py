@@ -49,15 +49,19 @@ for m in np.arange(len(zeta)):
 				magnitudes_spots = []
 				for i in np.arange(len(Tphot)):
 					if i != 0 and rho[p] != 0:
-						magnitudes_spots = np.column_stack((magnitudes_spots,
-								isochrone.colorize(Tspot[i], nlog_g[i],
-								log_Lspot[i]) +	isochrone.colorize(Tphot[i],
-								nlog_g[i], log_Lphot[i])))
-					elif i == 0 and rho[p] != 0:
-						magnitudes_spots = isochrone.colorize(Tspot[i],
-								nlog_g[i], log_Lspot[i]) + \
-								isochrone.colorize(Tphot[i], nlog_g[i],
+						mag_spot = isochrone.colorize(Tspot[i], nlog_g[i],
+								log_Lspot[i])
+						mag_phot = isochrone.colorize(Tphot[i],	nlog_g[i], 
 								log_Lphot[i])
+						mag_star = mag_tot(mag_spot, mag_phot)
+						magnitudes_spots = np.column_stack((magnitudes_spots,
+								mag_star))
+					elif i == 0 and rho[p] != 0:
+						mag_spot = isochrone.colorize(Tspot[i], nlog_g[i],
+								log_Lspot[i])
+						mag_phot = isochrone.colorize(Tphot[i],	nlog_g[i], 
+								log_Lphot[i])
+						magnitudes_spots = mag_tot(mag_spot, mag_phot)
 					elif i == 0:
 						magnitudes_spots = magnitudes
 					else:
