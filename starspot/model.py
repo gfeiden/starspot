@@ -273,3 +273,13 @@ class MassTrack(object):
 	def unload(self):
 		""" """
 
+def mag_tot(mag1, mag2):
+	""" computes total magnitude from two contributions """
+	# Total flux
+	flux1 = 10**(-mag1/2.5)
+	flux2 = 10**(-mag2/2.5)
+	flux_tot = flux1+flux2
+	# Corresponding magnitude
+	m_tot = -2.5*np.log10(flux_tot)
+	return m_tot
+
