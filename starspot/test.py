@@ -32,10 +32,10 @@ isochrone.save_unspotted(isodata, magnitudes)
 
 
 # Free parameters.
-zeta = np.arange(1,2)	# Luminosity ratio
-epsilon = np.arange(1,2)	# Surface ratio
-rho = np.arange(0,1)	# Spot coverage
-pi = np.arange(1,2) # Tspot/Tphot
+zeta=np.array([1]) # Luminosity ratio
+epsilon = np.array([1])	# Surface ratio
+rho = np.array([0])	# Spot coverage
+pi = np.array([1]) # Tspot/Tphot
 
 for m in np.arange(len(zeta)):
 	for n in np.arange(len(epsilon)):
@@ -48,7 +48,7 @@ for m in np.arange(len(zeta)):
 				# Compute magnitudes of spotted stars.
 				magnitudes_spots = []
 				for i in np.arange(len(Tphot)):
-					if i != 0 and rho[p] != 0:
+					if i != 0 and rho[p] != 0 and pi[q] != 0:
 						mag_spot = isochrone.colorize(Tspot[i], nlog_g[i],
 								log_Lspot[i])
 						mag_phot = isochrone.colorize(Tphot[i],	nlog_g[i], 
@@ -56,16 +56,21 @@ for m in np.arange(len(zeta)):
 						mag_star = mag_tot(mag_spot, mag_phot)
 						magnitudes_spots = np.column_stack((magnitudes_spots,
 								mag_star))
-					elif i == 0 and rho[p] != 0:
+					elif i == 0 and rho[p] != 0 and pi[q] != 0:
 						mag_spot = isochrone.colorize(Tspot[i], nlog_g[i],
 								log_Lspot[i])
 						mag_phot = isochrone.colorize(Tphot[i],	nlog_g[i], 
 								log_Lphot[i])
 						magnitudes_spots = mag_tot(mag_spot, mag_phot)
+					elif rho[p] == 0:
+						magnitudes_spots = magnitudes
 					elif i == 0:
-						magnitudes_spots = magnitudes
+						magnitudes_spots = isochrone.colorize(Tphot[i],
+							nlog_g[i], log_Lphot[i])
 					else:
-						magnitudes_spots = magnitudes
+						magnitudes_spots = np.column_stack((magnitudes_spots,
+								isochrone.colorize(Tphot[i], nlog_g[i],
+								log_Lphot[i])))
 				# Save spotted isochrone
 				isochrone.save_spotted(spots_params, isodata_spots,
 						magnitudes_spots)
