@@ -48,7 +48,6 @@ contains
         character(len=1), dimension(:), intent(in) :: filters
 
         !f2py intent(in) feh, afe, brand, filters
-        write(*, *) filters(1)
 
         call log_note('*** starting run ***')
         n_passbands = size(filters, 1)
