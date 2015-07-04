@@ -147,6 +147,13 @@ Semi-empirical bolometric corrections were derived by VandenBerg & Clem
 by empirically correcting theoretical bolometric corrections derived from 
 MARCS and ATLAS9 model atmospheres. See their publication for details.
 
+Empirical bolometric corrections for main-sequence stars at solar metallicity
+are taken from Pecaut & Mamajek ([2013, ApJS, 208, 9](http://adsabs.harvard.edu/abs/2013ApJS..208....9P)).
+Data tables packaged with this software are modified compared to the original
+tables. See [Eric Mamajek's webpage](http://www.pas.rochester.edu/~emamajek) 
+for the original table "A Modern Stellar Color and Effective Temperature Sequence
+for O9V - Y0V Dwarf Stars."
+
 # Citations
 
 If you make use of this code, please cite the relevant publications and 
@@ -164,6 +171,8 @@ note their contributions.
 
 * Hauschildt et al. ([1999, ApJ, 512, 377](http://adsabs.harvard.edu/abs/1999ApJ...512..377H); [1999, ApJ,
 525, 871](http://adsabs.harvard.edu/abs/1999ApJ...525..871H)) --- Creation and distribution of the PHOENIX AMES-COND model atmosphere code and data products.
+
+* Pecaut & Mamajek ([2013, ApJS, 208, 9](http://adsabs.harvard.edu/abs/2013ApJS..208....9P)) --- Empirical, main-sequence, solar metallicity bolometric corrections.
 
 Once the code is in a better and more user-friendly form, it will be provided
 with an official release version number (via GitHub) and a doi number through
