@@ -67,6 +67,9 @@ contains
                 call phoenix_amescond()
             case ('vc_semiemp')
                 call vc_semiemp()
+            case ('mamjek')
+                call log_warn('Pecaut and Mamajek only valid for MS, solar metallicity')
+                call bc_mamjek(0.0, 0.0, 1)
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
                 call marcs(feh, afe)
@@ -103,6 +106,11 @@ contains
 
         ! define bolometric magnitude
         m_bol = m_bol_sun - 2.5*logl
+
+        if (trim(brand) == 'mamjek') then
+            call bc_mamjek(teff, logl, mag_length, 0, magnitudes)
+            return
+        end if
 
         ! hunt for logg and teff indicies
         do i = 1, n_loggs
@@ -325,6 +333,26 @@ contains
     subroutine vc_semiemp()
         return
     end subroutine vc_semiemp
+
+    subroutine bc_mamjek(teff, logl, mag_length, init, magnitudes)
+        use interpolate, only: lagrange
+
+        integer,  intent(in) :: init, mag_length
+        real(dp), intent(in) :: teff, logl
+        real(dp), dimension(mag_length), intent(out) :: magnitudes
+
+        if (init == 1) then
+            ! read in the bolometric correction table
+            n_teffs = 102
+            n_loggs = 1
+            n_fehs  = 0
+
+            open(90, file="color/tab/pm13/")
+            ! read file header
+
+        end if
+
+    end subroutine bc_mamjek
 
 
 end module bolcorrection
