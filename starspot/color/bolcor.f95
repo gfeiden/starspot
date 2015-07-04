@@ -69,7 +69,7 @@ contains
                 call vc_semiemp()
             case ('mamjek')
                 call log_warn('Pecaut and Mamajek only valid for MS, solar metallicity')
-                call bc_mamjek(0.0, 0.0, 1)
+                call bc_mamjek(0.0, 0.0, 1, 1)
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
                 call marcs(feh, afe)
@@ -337,6 +337,8 @@ contains
     subroutine bc_mamjek(teff, logl, mag_length, init, magnitudes)
         use interpolate, only: lagrange
 
+        integer :: i, j
+
         integer,  intent(in) :: init, mag_length
         real(dp), intent(in) :: teff, logl
         real(dp), dimension(mag_length), intent(out) :: magnitudes
@@ -347,9 +349,34 @@ contains
             n_loggs = 1
             n_fehs  = 0
 
-            open(90, file="color/tab/pm13/")
-            ! read file header
+            if (allocated(bc_table) .eqv. .false.) then
+                call log_note('allocating memory for bc table')
+                allocate(bc_table(n_teffs, 18, 0))
+            else
+                call log_warn('bc table already allocated to memory, reallocating')
+                deallocate(bc_table)
+                allocate(bc_table(n_teffs, 18, 0))
+            end if
 
+            open(90, file="color/tab/pm13/EEM_dwarf_UBVIJHK_colors_Teff.txt", status="old")
+            ! read file header
+            do i = 1, 21
+                read(90)
+            end do
+
+            ! read in BC table
+            do i = 1, n_teffs
+                read(90) teffs(i), (bc_table(i, j), j = 1, 18)
+            end do
+            close(90)
+
+            return
+        else if (init == 0 .and. allocated(bc_table) .eqv. .false.) then
+            ! initialization error
+            call log_error('BC tables were not initialized.')
+            return
+        else
+            ! interpolate using 3-point lagrange interpolation
         end if
 
     end subroutine bc_mamjek
