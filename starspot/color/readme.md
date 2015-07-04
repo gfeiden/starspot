@@ -148,7 +148,8 @@ by empirically correcting theoretical bolometric corrections derived from
 MARCS and ATLAS9 model atmospheres. See their publication for details.
 
 Empirical bolometric corrections for main-sequence stars at solar metallicity
-are taken from Pecaut & Mamajek ([2013, ApJS, 208, 9](http://adsabs.harvard.edu/abs/2013ApJS..208....9P)).
+are taken from Pecaut & Mamajek ([2013, ApJS, 208, 9](http://adsabs.harvard.edu/abs/2013ApJS..208....9P))
+and maintained by Eric Mamajek (Version 2015.07.03). 
 Data tables packaged with this software are modified compared to the original
 tables. See [Eric Mamajek's webpage](http://www.pas.rochester.edu/~emamajek) 
 for the original table "A Modern Stellar Color and Effective Temperature Sequence
