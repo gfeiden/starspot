@@ -67,9 +67,9 @@ contains
                 call phoenix_amescond()
             case ('vc_semiemp')
                 call vc_semiemp()
-            case ('mamjek')
+            case ('mamajek')
                 call log_warn('Pecaut and Mamajek only valid for MS, solar metallicity')
-                call bc_mamjek(0.0, 0.0, 1, 1)
+                call bc_mamajek(0.0, 0.0, 1, 1)
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
                 call marcs(feh, afe)
@@ -334,7 +334,7 @@ contains
         return
     end subroutine vc_semiemp
 
-    subroutine bc_mamjek(teff, logl, mag_length, init, magnitudes)
+    subroutine bc_mamajek(teff, logl, mag_length, init, magnitudes)
         use interpolate, only: lagrange
 
         integer :: i, j
@@ -358,7 +358,7 @@ contains
                 allocate(bc_table(n_teffs, 18, 0))
             end if
 
-            open(90, file="color/tab/pm13/EEM_dwarf_UBVIJHK_colors_Teff.txt", status="old")
+            open(90, file="color/tab/pm13/Pecaut_Mamajek_2013_BCs.txt", status="old")
             ! read file header
             do i = 1, 21
                 read(90)
@@ -379,7 +379,7 @@ contains
             ! interpolate using 3-point lagrange interpolation
         end if
 
-    end subroutine bc_mamjek
+    end subroutine bc_mamajek
 
 
 end module bolcorrection
