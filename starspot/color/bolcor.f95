@@ -28,6 +28,7 @@ module bolcorrection
     integer, dimension(:), allocatable :: end_teff
 
     real(dp), dimension(:), allocatable :: fehs, teffs, loggs
+    real(dp), dimension(:,:), allocatable :: pm13_table
     real(dp), dimension(:,:,:), allocatable :: bc_table
 
     character(len=15) :: bc_type
@@ -182,6 +183,7 @@ contains
     subroutine bc_clean()
         if (allocated(passbands) .eqv. .true.) deallocate(passbands)
         if (allocated(bc_table) .eqv. .true.) deallocate(bc_table)
+        if (allocated(pm13_table) .eqv. .true.) deallocate(pm13_table)
         if (allocated(teffs) .eqv. .true.) deallocate(teffs)
         if (allocated(loggs) .eqv. .true.) deallocate(loggs)
         if (allocated(end_teff) .eqv. .true.) deallocate(end_teff)
@@ -337,46 +339,79 @@ contains
     subroutine bc_mamajek(teff, logl, mag_length, init, magnitudes)
         use interpolate, only: lagrange
 
-        integer :: i, j
+        integer :: i, j, k
 
         integer,  intent(in) :: init, mag_length
         real(dp), intent(in) :: teff, logl
+        real(dp) :: mbol
+        real(dp), parameter  :: m_bol_sun = 4.74
         real(dp), dimension(mag_length), intent(out) :: magnitudes
 
         if (init == 1) then
             ! read in the bolometric correction table
-            n_teffs = 102
+            n_teffs = 76
             n_loggs = 1
-            n_fehs  = 0
+            n_fehs  = 1
 
             if (allocated(bc_table) .eqv. .false.) then
                 call log_note('allocating memory for bc table')
-                allocate(bc_table(n_teffs, 18, 0))
+                allocate(pm13_table(n_teffs, 9))
             else
                 call log_warn('bc table already allocated to memory, reallocating')
                 deallocate(bc_table)
-                allocate(bc_table(n_teffs, 18, 0))
+                allocate(pm13_table(n_teffs, 9))
             end if
 
             open(90, file="color/tab/pm13/Pecaut_Mamajek_2013_BCs.txt", status="old")
             ! read file header
-            do i = 1, 21
+            do i = 1, 12
                 read(90)
             end do
 
             ! read in BC table
             do i = 1, n_teffs
-                read(90) teffs(i), (bc_table(i, j), j = 1, 18)
+                read(90) teffs(i), (pm13_table(i, j), j = 1, 9)
             end do
             close(90)
 
-            return
-        else if (init == 0 .and. allocated(bc_table) .eqv. .false.) then
+        else if (init == 0 .and. allocated(pm13_table) .eqv. .false.) then
             ! initialization error
             call log_error('BC tables were not initialized.')
-            return
+            write(*, *) 'BC tables were not initialized.'
         else
-            ! interpolate using 3-point lagrange interpolation
+            ! interpolate using 4-point lagrange interpolation
+            mbol = m_bol_sun - 2.5*logl
+
+            ! hunt for Teff index
+            do i = 1, n_teffs
+                if (teffs(i) > teff) then
+                    k = i
+                    exit
+                else
+                    cycle
+                end if
+            end do
+
+            ! protect against edge effects
+            if (n_teffs - k < 1) then
+                teff_index = n_teffs - 1
+            else if (k < 3) then
+                teff_index = 3
+            else
+                teff_index = k
+            end if
+
+            ! get interpolation coefficients for teff
+            call lagrange(teffs(teff_index - 2:teff_index + 1), coeffs, teff, 4)
+            do i = 1, 8
+                magnitudes(i) = coeffs(1)*pm13_table(teff_index - 2, i) + &
+                                coeffs(2)*pm13_table(teff_index - 1, i) + &
+                                coeffs(3)*pm13_table(teff_index    , i) + &
+                                coeffs(4)*pm13_table(teff_index + 1, i)
+
+                magnitudes(i) = m_bol - magnitudes(i)
+            end do
+
         end if
 
     end subroutine bc_mamajek
