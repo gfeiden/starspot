@@ -71,7 +71,7 @@ contains
                 call vc_semiemp()
             case ('mamajek')
                 call log_warn('Pecaut and Mamajek only valid for MS, solar metallicity')
-                call bc_mamajek(0.0_dp, 0.0_dp, 1, 1, dummy_array)
+                call bc_mamajek(0.0_dp, 0.0_dp, 2, 1, dummy_array)
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
                 call marcs(feh, afe)
@@ -110,7 +110,7 @@ contains
         m_bol = m_bol_sun - 2.5*logl
 
         if (trim(bc_type) == 'mamajek') then
-            call bc_mamjek(teff, logl, mag_length, 0, magnitudes)
+            call bc_mamajek(teff, logl, mag_length, 0, magnitudes)
             return
         end if
 
@@ -340,12 +340,12 @@ contains
     subroutine bc_mamajek(teff, logl, mag_length, init, magnitudes)
         use interpolate, only: lagrange
 
-        integer :: i, j, k, teff_index
+        integer :: i, j, k, teff_index, ioerr
 
-        integer,  intent(in) :: init, mag_length
-        real(dp), intent(in) :: teff, logl
+        integer,  intent(in)   :: init, mag_length
+        real(dp), intent(in)   :: teff, logl
         real(dp) :: m_bol
-        real(dp), parameter    :: m_bol_sun = 4.74
+        real(dp), parameter    :: m_bol_sun = 4.75
         real(dp), dimension(4) :: coeffs
         real(dp), dimension(mag_length), intent(out) :: magnitudes
 
@@ -355,26 +355,42 @@ contains
             n_loggs = 1
             n_fehs  = 1
 
-            if (allocated(bc_table) .eqv. .false.) then
+            if (allocated(pm13_table) .eqv. .false.) then
                 call log_note('allocating memory for bc table')
-                allocate(pm13_table(n_teffs, 9))
+                allocate(pm13_table(n_teffs, 8))
             else
                 call log_warn('bc table already allocated to memory, reallocating')
-                deallocate(bc_table)
-                allocate(pm13_table(n_teffs, 9))
+                deallocate(pm13_table)
+                allocate(pm13_table(n_teffs, 8))
+            end if
+            
+            if (allocated(teffs) .eqv. .false.) then
+                call log_note('allocating memory for Teffs')
+                allocate(teffs(n_teffs))
+            else
+                call log_warn('Teffs already allocated to memory, reallocating')
+                deallocate(teffs)
+                allocate(teffs(n_teffs))
             end if
 
-            open(90, file="color/tab/pm13/Pecaut_Mamajek_2013_BCs.txt", status="old")
+            open(unit=90, file="./color/tab/pm13/Pecaut_Mamajek_2013_BCs.txt", status="old", iostat=ioerr)
+            if (ioerr /= 0) then
+                call log_error('header file IO error in bc_mamajek, cannot continue')
+                stop
+            end if
+            
             ! read file header
             do i = 1, 12
-                read(90)
+                read(90, *)
             end do
+            call log_note('bc table header read successfully')
 
             ! read in BC table
             do i = 1, n_teffs
-                read(90) teffs(i), (pm13_table(i, j), j = 1, 9)
+                read(90, *) teffs(i), (pm13_table(i, j), j = 1, 8)
             end do
             close(90)
+            call log_note('bc table successfully loaded')
 
         else if (init == 0 .and. allocated(pm13_table) .eqv. .false.) then
             ! initialization error
@@ -404,12 +420,11 @@ contains
             end if
 
             ! get interpolation coefficients for teff
-            call lagrange(teffs(teff_index - 2:teff_index + 1), coeffs, teff, 4)
+            call lagrange(teffs(teff_index - 1:teff_index + 1), coeffs, teff, 3)
             do i = 1, 8
-                magnitudes(i) = coeffs(1)*pm13_table(teff_index - 2, i) + &
-                                coeffs(2)*pm13_table(teff_index - 1, i) + &
-                                coeffs(3)*pm13_table(teff_index    , i) + &
-                                coeffs(4)*pm13_table(teff_index + 1, i)
+                magnitudes(i) = coeffs(1)*pm13_table(teff_index - 1, i) + &
+                                coeffs(2)*pm13_table(teff_index    , i) + &
+                                coeffs(3)*pm13_table(teff_index + 1, i) 
 
                 magnitudes(i) = m_bol - magnitudes(i)
             end do
