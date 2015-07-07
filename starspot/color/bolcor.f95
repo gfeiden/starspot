@@ -44,6 +44,7 @@ contains
         integer :: i
 
         real(dp), intent(in) :: feh, afe
+        real(dp), dimension(2) :: dummy_array
 
         character(len=15), intent(in) :: brand
         character(len=1), dimension(:), intent(in) :: filters
@@ -70,7 +71,7 @@ contains
                 call vc_semiemp()
             case ('mamajek')
                 call log_warn('Pecaut and Mamajek only valid for MS, solar metallicity')
-                call bc_mamajek(0.0_dp, 0.0_dp, 1, 1)
+                call bc_mamajek(0.0_dp, 0.0_dp, 1, 1, dummy_array)
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
                 call marcs(feh, afe)
@@ -344,7 +345,8 @@ contains
         integer,  intent(in) :: init, mag_length
         real(dp), intent(in) :: teff, logl
         real(dp) :: m_bol
-        real(dp), parameter  :: m_bol_sun = 4.74
+        real(dp), parameter    :: m_bol_sun = 4.74
+        real(dp), dimension(4) :: coeffs
         real(dp), dimension(mag_length), intent(out) :: magnitudes
 
         if (init == 1) then
@@ -380,7 +382,7 @@ contains
             write(*, *) 'BC tables were not initialized.'
         else
             ! interpolate using 4-point lagrange interpolation
-            mbol = m_bol_sun - 2.5*logl
+            m_bol = m_bol_sun - 2.5*logl
 
             ! hunt for Teff index
             do i = 1, n_teffs
