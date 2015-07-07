@@ -70,7 +70,7 @@ contains
                 call vc_semiemp()
             case ('mamajek')
                 call log_warn('Pecaut and Mamajek only valid for MS, solar metallicity')
-                call bc_mamajek(0.0, 0.0, 1, 1)
+                call bc_mamajek(0.0_dp, 0.0_dp, 1, 1)
             case default
                 call log_warn('invalid bc_type in bc_init: default to marcs08')
                 call marcs(feh, afe)
@@ -108,7 +108,7 @@ contains
         ! define bolometric magnitude
         m_bol = m_bol_sun - 2.5*logl
 
-        if (trim(brand) == 'mamjek') then
+        if (trim(bc_type) == 'mamajek') then
             call bc_mamjek(teff, logl, mag_length, 0, magnitudes)
             return
         end if
@@ -339,11 +339,11 @@ contains
     subroutine bc_mamajek(teff, logl, mag_length, init, magnitudes)
         use interpolate, only: lagrange
 
-        integer :: i, j, k
+        integer :: i, j, k, teff_index
 
         integer,  intent(in) :: init, mag_length
         real(dp), intent(in) :: teff, logl
-        real(dp) :: mbol
+        real(dp) :: m_bol
         real(dp), parameter  :: m_bol_sun = 4.74
         real(dp), dimension(mag_length), intent(out) :: magnitudes
 
