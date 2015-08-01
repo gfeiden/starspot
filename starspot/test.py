@@ -62,15 +62,14 @@ for m in np.arange(len(zeta)):
 						mag_phot = isochrone.colorize(Tphot[i],	nlog_g[i], 
 								log_Lphot[i])
 						magnitudes_spots = mag_tot(mag_spot, mag_phot)
-					elif rho[p] == 0:
-						magnitudes_spots = magnitudes
-					elif i == 0:
-						magnitudes_spots = isochrone.colorize(Tphot[i],
-							nlog_g[i], log_Lphot[i])
-					else:
+					elif i != 0:
 						magnitudes_spots = np.column_stack((magnitudes_spots,
 								isochrone.colorize(Tphot[i], nlog_g[i],
 								log_Lphot[i])))
+					else:
+						magnitudes_spots = isochrone.colorize(Tphot[i],
+							nlog_g[i], log_Lphot[i])
+											
 				# Save spotted isochrone
 				isochrone.save_spotted(spots_params, isodata_spots,
 						magnitudes_spots)
