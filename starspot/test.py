@@ -1,23 +1,24 @@
 #
 #
-from model import *
+import numpy as np
+import starspot as spot
 
 # Load isochrone.
 age  = 4.0
 Fe_H = 0.0
 a_Fe = 0.0
 
-iso = Isochrone(age, Fe_H)
+iso = spot.Isochrone(age, Fe_H)
 iso.load()
 
 
 # Initialize log file.
-bc.utils.log_init('example.log')
+spot.bc.utils.log_init('example.log')
 
 # Initialize bolometric correction table at fixed [Fe/H] and [a/Fe].
 brand = 'marcs'
 filters = ['r', 'J', 'H', 'K']
-bc.bolcorrection.bc_init(Fe_H, a_Fe, brand, filters)
+spot.bc.bolcorrection.bc_init(Fe_H, a_Fe, brand, filters)
 
 # Compute magnitudes.
 magnitudes = []
@@ -78,5 +79,5 @@ for m in np.arange(len(zeta)):
 						magnitudes_spots)
 
 # Release allocated memory and close log file
-bc.bolcorrection.bc_clean()
-bc.utils.log_close()
+spot.bc.bolcorrection.bc_clean()
+spot.bc.utils.log_close()
