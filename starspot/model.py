@@ -66,16 +66,13 @@ class Isochrone(object):
         self.logL = isodata[3]
         self.logR = isodata[4]
         self.A_Li = isodata[5]
-        
-        return isodata, self.logT, self.logg, self.logL
+        self.Teff = 10**self.logT
 
     def unload(self):
         """ """
 
-    def add_spots(self, isodata, spots_params):
+    def add_spots(self, spots_params):
         """ adds spots to isochrone model assuming a two-temperature model """
-        self.Teff = 10**self.logT
-
         self.zeta    = spots_params[0] # fractional luminosity brightening/dimming
         self.epsilon = spots_params[1] # fractional radius de/inflation
         self.rho     = spots_params[2] # spot surface coverage
@@ -120,16 +117,17 @@ class Isochrone(object):
         return bc.bolcorrection.bc_eval(Teff, log_g, log_L, len(filters))
         
 
-    def save_unspotted(self, isodata, magnitudes):
+    def save_unspotted(self, magnitudes):
         """ Write out a copy of the unspotted isochrone with synthetic photometry """
 
         # Create the directory where data will be saved if needed
-        color_iso_directory = "./iso/age_{:07.1f}myr_z{:+05.2f}".format(self.age, self.Fe_H)
-        #if exists(color_iso_directory) == False:
-        #    os.mkdir(color_iso_directory)
-        #else:
-        #    pass
+        # color_iso_directory = "./iso/age_{:07.1f}myr_z{:+05.2f}".format(self.age, self.Fe_H)
         color_iso_directory = "./iso"
+        if exists(color_iso_directory) == False:
+            os.mkdir(color_iso_directory)
+        else:
+            pass
+        
 
         # format isochrone file name
         isofile = "dmestar_{:07.1f}myr_z{:+5.2f}_a{:+5.2f}_gs98_phx".format(self.age,
