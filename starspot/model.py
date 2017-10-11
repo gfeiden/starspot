@@ -186,12 +186,12 @@ class Isochrone(object):
         #pi      = spots_params[3]
 
         # Create the directory where data will be saved if needed
-        color_iso_directory = "./iso/age_{:07.1f}myr_z{:+05.2f}".format(self.age, self.Fe_H)
-        #if exists(color_iso_directory) == False:
-        #    os.mkdir(color_iso_directory)
-        #else:
-        #    pass
+        # color_iso_directory = "./iso/age_{:07.1f}myr_z{:+05.2f}".format(self.age, self.Fe_H)
         color_iso_directory = "./iso"
+        if exists(color_iso_directory) == False:
+            os.mkdir(color_iso_directory)
+        else:
+            pass
 
         # Create a file with data comparable to observations. Included :
         # m, Tavg, log_g (new), log_L (new), log_R (new), A(Li)
